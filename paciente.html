@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Formulário de Saúde</title>
+<style>
+:root{
+  --verde:#1a6b3c;--verde-bg:#edf7f1;--verde-borda:#9dd4b4;
+  --laranja:#e65100;--laranja-bg:#fff8f0;--laranja-borda:#ffcc80;
+  --azul:#0d4a7a;--azul-bg:#e8f2fb;--azul-borda:#a8ccee;
+  --text:#1a1917;--text2:#5c5a55;--text3:#9c9a95;
+  --bg:#f5f4f0;--surface:#fff;--border:#dddbd4;
+  --radius:10px;--font:'Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+.header{background:var(--verde);color:#fff;padding:20px;text-align:center}
+.header h1{font-size:18px;font-weight:600;margin-bottom:4px}
+.header p{font-size:13px;opacity:.85}
+.container{max-width:540px;margin:0 auto;padding:20px 16px}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:14px}
+.field label{font-size:13px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px}
+.field select,.field textarea,.field input{font-family:var(--font);font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;width:100%;background:var(--surface);color:var(--text)}
+.field select:focus,.field textarea:focus,.field input:focus{outline:none;border-color:var(--verde)}
+.field textarea{resize:vertical;min-height:80px}
+.dominio{font-size:12px;font-weight:600;color:var(--laranja);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--laranja-borda)}
+.roda-item{margin-bottom:12px}
+.roda-item label{font-size:14px;color:var(--text2);display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.roda-item input[type=range]{width:100%;accent-color:var(--laranja);height:6px}
+.roda-val{font-size:15px;font-weight:700;color:var(--laranja);min-width:24px;text-align:right}
+.opcoes{display:flex;flex-direction:column;gap:8px}
+.opcao{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--surface)}
+.opcao:has(input:checked){background:var(--verde-bg);border-color:var(--verde)}
+.opcao input{display:none}
+.opcao-texto{font-size:14px;color:var(--text)}
+.opcao:has(input:checked) .opcao-texto{color:var(--verde);font-weight:500}
+.check-mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.opcao:has(input:checked) .check-mark{background:var(--verde);border-color:var(--verde);color:#fff}
+.score-box{background:var(--verde-bg);border:1px solid var(--verde-borda);border-radius:8px;padding:12px;text-align:center;margin-top:12px;display:none}
+.score-box .score-num{font-size:28px;font-weight:700;color:var(--verde)}
+.score-box .score-label{font-size:13px;color:var(--verde);margin-top:2px}
+.btn-enviar{width:100%;padding:16px;background:var(--verde);color:#fff;border:none;border-radius:var(--radius);font-size:16px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-enviar:hover{opacity:.9}
+.btn-enviar:disabled{opacity:.5;cursor:not-allowed}
+.secao{display:none}
+.secao.ativa{display:block}
+.progresso{display:flex;gap:4px;margin-bottom:20px}
+.prog-item{flex:1;height:4px;border-radius:2px;background:var(--border)}
+.prog-item.feito{background:var(--verde)}
+.prog-item.atual{background:var(--laranja)}
+.intro-box{background:var(--azul-bg);border:1px solid var(--azul-borda);border-radius:var(--radius);padding:16px;margin-bottom:16px;font-size:14px;color:var(--azul);line-height:1.6}
+.sucesso{display:none;text-align:center;padding:40px 20px}
+.sucesso .emoji{font-size:56px;margin-bottom:16px}
+.sucesso h2{font-size:22px;font-weight:600;margin-bottom:8px;color:var(--verde)}
+.sucesso p{font-size:14px;color:var(--text2);line-height:1.6}
+.nav-btns{display:flex;gap:10px;margin-top:16px}
+.btn-prox{flex:1;padding:14px;background:var(--verde);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer}
+.btn-ant{padding:14px 20px;background:none;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;cursor:pointer;color:var(--text2)}
+.aviso-pilar{background:var(--laranja-bg);border:1px solid var(--laranja-borda);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--laranja);margin-bottom:12px;display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="headerTitulo">Questionário de Saúde</h1>
+  <p id="headerSub">Responda com calma, no seu tempo</p>
+</div>
+
+<div class="container">
+
+  <!-- PROGRESSO -->
+  <div class="progresso" id="progresso"></div>
+
+  <!-- INTRO -->
+  <div class="secao ativa" id="secIntro">
+    <div class="intro-box">
+      <strong>Olá! 👋</strong><br>
+      Este formulário foi enviado pelo seu médico para te ajudar a ter uma consulta mais completa e personalizada.<br><br>
+      Responda com sinceridade — não há respostas certas ou erradas. Leva cerca de <strong id="tempoEstimado">5 minutos</strong>.
+    </div>
+    <div class="card">
+      <div class="card-title">Identificação</div>
+      <div class="field">
+        <label>Seu nome completo</label>
+        <input type="text" id="pacNome" placeholder="Nome completo" />
+      </div>
+      <div class="field">
+        <label>Data de nascimento</label>
+        <input type="date" id="pacDnasc" />
+      </div>
+    </div>
+    <button class="btn-prox" onclick="iniciar()">Começar →</button>
+  </div>
+
+  <!-- FANTÁSTICO -->
+  <div class="secao" id="secFantastico">
+    <div class="card">
+      <div class="card-title">Questionário Fantástico — Qualidade de vida</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Nas últimas semanas, como você tem se sentido em relação a cada item abaixo?</p>
+      <div id="fantQs"></div>
+      <div class="score-box" id="fantScoreBox">
+        <div class="score-num" id="fantScoreNum">—</div>
+        <div class="score-label" id="fantScoreLabel">Calculando...</div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="irPara('secIntro')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secFantastico')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- RODA DA VIDA -->
+  <div class="secao" id="secRoda">
+    <div class="card">
+      <div class="card-title">Roda da vida</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Avalie sua satisfação em cada área da sua vida de 0 (muito insatisfeito) a 10 (muito satisfeito).</p>
+      <div id="rodaQs"></div>
+      <canvas id="rodaCanvasPac" width="280" height="280" style="display:block;margin:16px auto 0"></canvas>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secRoda')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secRoda')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- PHQ-9 -->
+  <div class="secao" id="secPHQ9">
+    <div class="card">
+      <div class="card-title">Como você tem se sentido?</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Nas <strong>últimas 2 semanas</strong>, com que frequência você foi incomodado(a) por:</p>
+      <div id="phq9Qs"></div>
+      <div class="score-box" id="phq9ScoreBox">
+        <div class="score-num" id="phq9ScoreNum">—</div>
+        <div class="score-label" id="phq9ScoreLabel">—</div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secPHQ9')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secPHQ9')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- GAD-7 -->
+  <div class="secao" id="secGAD7">
+    <div class="card">
+      <div class="card-title">Ansiedade e preocupação</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Nas <strong>últimas 2 semanas</strong>, com que frequência você foi incomodado(a) por:</p>
+      <div id="gad7Qs"></div>
+      <div class="score-box" id="gad7ScoreBox">
+        <div class="score-num" id="gad7ScoreNum">—</div>
+        <div class="score-label" id="gad7ScoreLabel">—</div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secGAD7')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secGAD7')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- AUDIT -->
+  <div class="secao" id="secAUDIT">
+    <div class="card">
+      <div class="card-title">Uso de álcool</div>
+      <div id="auditQs"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secAUDIT')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secAUDIT')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- FAGERSTRÖM -->
+  <div class="secao" id="secFager">
+    <div class="card">
+      <div class="card-title">Tabagismo</div>
+      <div id="fagerQs"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secFager')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secFager')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- STOP-BANG -->
+  <div class="secao" id="secStopBang">
+    <div class="card">
+      <div class="card-title">Qualidade do sono</div>
+      <div id="stopbangQs"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secStopBang')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secStopBang')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- EPWORTH -->
+  <div class="secao" id="secEpworth">
+    <div class="card">
+      <div class="card-title">Sonolência durante o dia</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Qual a chance de você cochilar nas situações abaixo?</p>
+      <div id="epworthQs"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secEpworth')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secEpworth')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- IPAQ -->
+  <div class="secao" id="secIPAQ">
+    <div class="card">
+      <div class="card-title">Atividade física</div>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Considere as atividades realizadas nos <strong>últimos 7 dias</strong>.</p>
+      <div id="ipaqQs"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-ant" onclick="voltarDe('secIPAQ')">← Voltar</button>
+      <button class="btn-prox" onclick="proximoApos('secIPAQ')">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- REVISÃO E ENVIO -->
+  <div class="secao" id="secEnvio">
+    <div class="card">
+      <div class="card-title">Tudo pronto!</div>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+        Obrigado por preencher! Suas respostas serão analisadas pelo seu médico antes da consulta.
+      </p>
+      <div id="resumoScores" style="background:var(--bg);border-radius:8px;padding:14px"></div>
+    </div>
+    <button class="btn-enviar" id="btnEnviar" onclick="enviarRespostas()">Enviar respostas ✓</button>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="sucesso" id="secSucesso">
+    <div class="emoji">✅</div>
+    <h2>Respostas enviadas!</h2>
+    <p>Seu médico já recebeu suas respostas e estará preparado para uma consulta mais completa e personalizada para você.</p>
+    <p style="margin-top:16px;font-size:13px;color:var(--text3)">Você pode fechar esta página.</p>
+  </div>
+
+</div>
+
+<script>
+// ===== CONFIGURAÇÃO =====
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxZqoqCVYcty5hzAABlQN7kemCg_-NGC0snLPp4mbDk5vQXQOm99g_VDu8tX7aUsFVG/exec';
+
+// Ler parâmetros da URL
+const urlParams = new URLSearchParams(window.location.search);
+const CPF_PAC = urlParams.get('cpf') || '';
+const TESTES = (urlParams.get('testes') || 'fantastico').split(',');
+const NOME_MEDICO = urlParams.get('medico') || 'seu médico';
+
+// Atualizar header
+document.getElementById('headerSub').textContent = 'Enviado por ' + NOME_MEDICO;
+
+// ===== DADOS DOS QUESTIONÁRIOS =====
+const RODA_AREAS = ['Saúde física','Saúde mental','Alimentação','Sono','Atividade física','Relacionamentos','Trabalho','Lazer','Finanças','Espiritualidade'];
+
+const PHQ9_QS = [
+  'Pouco interesse ou prazer em fazer as coisas',
+  'Se sentir para baixo, deprimido(a) ou sem perspectiva',
+  'Dificuldade para dormir ou dormir demais',
+  'Se sentir cansado(a) ou com pouca energia',
+  'Pouco apetite ou comer demais',
+  'Se sentir mal consigo mesmo(a)',
+  'Dificuldade para se concentrar',
+  'Se mover ou falar mais devagar (ou mais agitado)',
+  'Pensamentos de se machucar'
+];
+
+const GAD7_QS = [
+  'Se sentir nervoso(a), ansioso(a) ou no limite',
+  'Não conseguir parar ou controlar as preocupações',
+  'Se preocupar demais com coisas diferentes',
+  'Dificuldade para relaxar',
+  'Ficar tão agitado(a) que é difícil ficar parado(a)',
+  'Ficar facilmente irritado(a)',
+  'Sentir medo como se algo terrível fosse acontecer'
+];
+
+const FREQ4_OPTS = ['Nenhuma vez','Vários dias','Mais da metade dos dias','Quase todos os dias'];
+
+const AUDIT_DATA = [
+  {q:'Com que frequência você toma bebidas alcoólicas?',o:['Nunca','Mensalmente ou menos','2 a 4x por mês','2 a 3x por semana','4 ou mais vezes por semana']},
+  {q:'Quando bebe, quantas doses você consome num dia típico?',o:['1 ou 2','3 ou 4','5 ou 6','7 a 9','10 ou mais']},
+  {q:'Com que frequência você consome 6 ou mais doses numa ocasião?',o:['Nunca','Menos de 1x por mês','Mensalmente','Semanalmente','Diariamente ou quase']},
+  {q:'Com que frequência perdeu o controle sobre a quantidade que bebeu?',o:['Nunca','Menos de 1x por mês','Mensalmente','Semanalmente','Diariamente ou quase']},
+  {q:'Com que frequência deixou de fazer algo esperado por causa do álcool?',o:['Nunca','Menos de 1x por mês','Mensalmente','Semanalmente','Diariamente ou quase']},
+  {q:'Com que frequência precisou beber pela manhã para se sentir melhor?',o:['Nunca','Menos de 1x por mês','Mensalmente','Semanalmente','Diariamente ou quase']},
+  {q:'Com que frequência sentiu culpa ou remorso após beber?',o:['Nunca','Menos de 1x por mês','Mensalmente','Semanalmente','Diariamente ou quase']},
+  {q:'Com que frequência não conseguiu lembrar do que aconteceu por ter bebido?',o:['Nunca','Menos de 1x por mês','Mensalmente','Semanalmente','Diariamente ou quase']},
+  {q:'Você ou alguém já se machucou por causa do seu modo de beber?',o:['Não','Sim, mas não no último ano','Sim, no último ano']},
+  {q:'Alguém já se preocupou com seu modo de beber ou sugeriu que parasse?',o:['Não','Sim, mas não no último ano','Sim, no último ano']}
+];
+
+const FAGER_DATA = [
+  {q:'Quanto tempo após acordar você fuma o primeiro cigarro?',o:['Até 5 minutos','6 a 30 minutos','31 a 60 minutos','Mais de 60 minutos'],v:[3,2,1,0]},
+  {q:'Você acha difícil não fumar em lugares proibidos?',o:['Sim','Não'],v:[1,0]},
+  {q:'Qual cigarro do dia lhe traz mais satisfação?',o:['O primeiro da manhã','Outros'],v:[1,0]},
+  {q:'Quantos cigarros você fuma por dia?',o:['10 ou menos','11 a 20','21 a 30','31 ou mais'],v:[0,1,2,3]},
+  {q:'Você fuma mais frequentemente nas primeiras horas após acordar?',o:['Sim','Não'],v:[1,0]},
+  {q:'Você fuma mesmo estando doente e acamado?',o:['Sim','Não'],v:[1,0]}
+];
+
+const STOPBANG_QS = [
+  'Você ronca alto (alto o suficiente para ser ouvido através de portas fechadas)?',
+  'Você frequentemente se sente cansado(a), fatigado(a) ou com sono durante o dia?',
+  'Alguém observou que você para de respirar durante o sono?',
+  'Você tem ou está sendo tratado(a) para pressão alta?',
+  'Seu IMC é maior que 35?',
+  'Sua idade é maior que 50 anos?',
+  'Sua circunferência do pescoço é maior que 40cm?',
+  'Você é do sexo masculino?'
+];
+
+const EPWORTH_QS = [
+  'Sentado(a) e lendo',
+  'Assistindo televisão',
+  'Sentado(a) em lugar público sem atividade (sala de espera, cinema)',
+  'Andando de carro por 1 hora sem parar como passageiro',
+  'Deitado(a) para descansar à tarde',
+  'Sentado(a) conversando com alguém',
+  'Sentado(a) calmamente após almoço sem álcool',
+  'No carro, parado por alguns minutos no trânsito'
+];
+
+const EPWORTH_OPTS = ['Nenhuma chance','Pequena chance','Chance moderada','Alta chance'];
+
+const FANTASTICO_DATA = [
+  {d:'Família e amigos',q:'Tenho alguém com quem conversar sobre coisas importantes para mim',o:['Quase nunca','Algumas vezes','Quase sempre']},
+  {d:'Família e amigos',q:'Dou e recebo afeto',o:['Quase nunca','Algumas vezes','Quase sempre']},
+  {d:'Atividade física',q:'Faço exercícios vigorosos por pelo menos 30 minutos, mais de 3 vezes por semana',o:['Não','Sim, 1-2x por semana','Sim, 3x ou mais por semana']},
+  {d:'Atividade física',q:'Faço atividades de lazer ativas (caminhada, jardinagem, etc)',o:['Raramente','Algumas vezes','Com frequência']},
+  {d:'Nutrição',q:'Como uma dieta balanceada',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Nutrição',q:'Frequentemente como em excesso (gordura, açúcar ou sal)',o:['Quase sempre','Algumas vezes','Raramente']},
+  {d:'Nutrição',q:'Estou no peso ideal para minha altura',o:['Não','+/- próximo','Sim']},
+  {d:'Tabaco e tóxicos',q:'Fumo cigarros',o:['Mais de 10 por dia','1 a 10 por dia','Não fumo']},
+  {d:'Tabaco e tóxicos',q:'Uso drogas como maconha, cocaína ou similares',o:['Sim','Ocasionalmente','Não']},
+  {d:'Tabaco e tóxicos',q:'Faço uso abusivo de medicamentos',o:['Sim','Ocasionalmente','Não']},
+  {d:'Álcool',q:'Número de doses de álcool que consumo por semana',o:['Mais de 14','7 a 14','Menos de 7']},
+  {d:'Álcool',q:'Bebo mais de 4 doses em uma única ocasião',o:['Frequentemente','Ocasionalmente','Nunca']},
+  {d:'Sono e estresse',q:'Durmo bem e me sinto descansado(a)',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Sono e estresse',q:'Sinto que me estresso muito',o:['Quase sempre','Algumas vezes','Raramente']},
+  {d:'Sono e estresse',q:'Sou capaz de lidar com o estresse do dia a dia',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Trabalho',q:'Me relaxo e desfruto do meu tempo de lazer',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Trabalho',q:'Me sinto preocupado(a) ou sob pressão',o:['Quase sempre','Algumas vezes','Raramente']},
+  {d:'Introspecção',q:'Sinto-me positivo(a) e feliz',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Introspecção',q:'Sinto-me tão deprimido(a) que nada parece me animar',o:['Quase sempre','Algumas vezes','Raramente']},
+  {d:'Carreira',q:'Estou satisfeito(a) com meu trabalho ou função',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Outros comportamentos',q:'Uso cinto de segurança',o:['Raramente','Algumas vezes','Sempre']},
+  {d:'Outros comportamentos',q:'Consigo controlar minha alimentação e peso',o:['Raramente','Algumas vezes','Quase sempre']},
+  {d:'Outros comportamentos',q:'Faço exames de saúde periódicos',o:['Raramente','Algumas vezes','Regularmente']},
+  {d:'Outros comportamentos',q:'Pratico sexo seguro',o:['Raramente','Algumas vezes','Sempre / Não se aplica']},
+  {d:'Outros comportamentos',q:'Sou capaz de expressar meus sentimentos',o:['Raramente','Algumas vezes','Quase sempre']}
+];
+
+// ===== SEQUÊNCIA DE SEÇÕES =====
+const TODAS_SECOES = ['secIntro','secFantastico','secRoda','secPHQ9','secGAD7','secAUDIT','secFager','secStopBang','secEpworth','secIPAQ','secEnvio'];
+const MAPA_TESTES = {
+  'fantastico': 'secFantastico',
+  'roda': 'secRoda',
+  'phq9': 'secPHQ9',
+  'gad7': 'secGAD7',
+  'audit': 'secAUDIT',
+  'fager': 'secFager',
+  'stopbang': 'secStopBang',
+  'epworth': 'secEpworth',
+  'ipaq': 'secIPAQ'
+};
+
+// Montar sequência ativa baseada nos testes solicitados
+var secoesAtivas = ['secIntro'];
+TODAS_SECOES.forEach(function(s) {
+  if (s === 'secIntro' || s === 'secEnvio') return;
+  var testeKey = Object.keys(MAPA_TESTES).find(function(k) { return MAPA_TESTES[k] === s; });
+  if (testeKey && TESTES.indexOf(testeKey) >= 0) secoesAtivas.push(s);
+});
+secoesAtivas.push('secEnvio');
+
+var secaoAtual = 0;
+
+// ===== FUNÇÕES DE NAVEGAÇÃO =====
+function irPara(secId) {
+  document.querySelectorAll('.secao').forEach(function(s) { s.classList.remove('ativa'); });
+  document.getElementById(secId).classList.add('ativa');
+  secaoAtual = secoesAtivas.indexOf(secId);
+  atualizarProgresso();
+  window.scrollTo(0, 0);
+}
+
+function proximoApos(secId) {
+  var idx = secoesAtivas.indexOf(secId);
+  if (idx < secoesAtivas.length - 1) {
+    irPara(secoesAtivas[idx + 1]);
+    if (secoesAtivas[idx + 1] === 'secEnvio') montarResumo();
+  }
+}
+
+function voltarDe(secId) {
+  var idx = secoesAtivas.indexOf(secId);
+  if (idx > 0) irPara(secoesAtivas[idx - 1]);
+}
+
+function iniciar() {
+  var nome = document.getElementById('pacNome').value.trim();
+  if (!nome) { alert('Por favor, informe seu nome.'); return; }
+  irPara(secoesAtivas[1]);
+}
+
+function atualizarProgresso() {
+  var prog = document.getElementById('progresso');
+  prog.innerHTML = secoesAtivas.map(function(s, i) {
+    var cls = i < secaoAtual ? 'feito' : i === secaoAtual ? 'atual' : '';
+    return '<div class="prog-item ' + cls + '"></div>';
+  }).join('');
+}
+
+// ===== CONSTRUÇÃO DOS FORMULÁRIOS =====
+function buildOpcoes(containerId, qs, opts, prefix, onchange) {
+  var c = document.getElementById(containerId);
+  if (!c || c.children.length > 0) return;
+  qs.forEach(function(q, i) {
+    var d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = '<label>' + (i+1) + '. ' + q + '</label><div class="opcoes">' +
+      opts.map(function(o, v) {
+        return '<label class="opcao"><input type="radio" name="' + prefix + i + '" value="' + v + '" onchange="' + onchange + '"><div class="check-mark">✓</div><span class="opcao-texto">' + o + '</span></label>';
+      }).join('') + '</div>';
+    c.appendChild(d);
+  });
+}
+
+function buildCustomOpcoes(containerId, data, prefix, onchange) {
+  var c = document.getElementById(containerId);
+  if (!c || c.children.length > 0) return;
+  data.forEach(function(item, i) {
+    var d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = '<label>' + (i+1) + '. ' + item.q + '</label><div class="opcoes">' +
+      item.o.map(function(o, v) {
+        return '<label class="opcao"><input type="radio" name="' + prefix + i + '" value="' + v + '" onchange="' + onchange + '"><div class="check-mark">✓</div><span class="opcao-texto">' + o + '</span></label>';
+      }).join('') + '</div>';
+    c.appendChild(d);
+  });
+}
+
+function buildYesNo(containerId, qs, prefix, onchange) {
+  var c = document.getElementById(containerId);
+  if (!c || c.children.length > 0) return;
+  qs.forEach(function(q, i) {
+    var d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = '<label>' + q + '</label><div class="opcoes">' +
+      '<label class="opcao"><input type="radio" name="' + prefix + i + '" value="1" onchange="' + onchange + '"><div class="check-mark">✓</div><span class="opcao-texto">Sim</span></label>' +
+      '<label class="opcao"><input type="radio" name="' + prefix + i + '" value="0" onchange="' + onchange + '"><div class="check-mark">✓</div><span class="opcao-texto">Não</span></label>' +
+    '</div>';
+    c.appendChild(d);
+  });
+}
+
+function buildIPAQ() {
+  var c = document.getElementById('ipaqQs');
+  if (!c || c.children.length > 0) return;
+  var qs = [
+    {q:'Em quantos dias você caminhou por pelo menos 10 minutos contínuos?',ph:'0 a 7 dias'},
+    {q:'Quanto tempo você caminhou nesses dias? (minutos por dia)',ph:'ex: 30'},
+    {q:'Em quantos dias fez atividade física moderada? (bicicleta, natação leve)',ph:'0 a 7 dias'},
+    {q:'Quanto tempo por dia nesses dias? (minutos)',ph:'ex: 45'},
+    {q:'Em quantos dias fez atividade física vigorosa? (corrida, futebol, aeróbica)',ph:'0 a 7 dias'},
+    {q:'Quanto tempo por dia nesses dias? (minutos)',ph:'ex: 60'},
+    {q:'Quanto tempo você fica sentado(a) por dia nos dias de semana? (horas)',ph:'ex: 8'}
+  ];
+  qs.forEach(function(item, i) {
+    var d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = '<label>' + (i+1) + '. ' + item.q + '</label>' +
+      '<input type="number" id="ipaqp' + i + '" placeholder="' + item.ph + '" min="0" oninput="calcIPAQPac()">';
+    c.appendChild(d);
+  });
+}
+
+function buildRoda() {
+  var c = document.getElementById('rodaQs');
+  if (!c || c.children.length > 0) return;
+  RODA_AREAS.forEach(function(area, i) {
+    var d = document.createElement('div');
+    d.className = 'roda-item';
+    d.innerHTML = '<label>' + area + ' <span class="roda-val" id="rodapv' + i + '">5</span></label>' +
+      '<input type="range" min="0" max="10" value="5" id="rodap' + i + '" oninput="updateRodaPac(' + i + ',this.value)">';
+    c.appendChild(d);
+  });
+  desenharRodaPac();
+}
+
+function buildFantastico() {
+  var c = document.getElementById('fantQs');
+  if (!c || c.children.length > 0) return;
+  var curD = '';
+  FANTASTICO_DATA.forEach(function(item, i) {
+    if (item.d !== curD) {
+      curD = item.d;
+      var h = document.createElement('div');
+      h.className = 'dominio';
+      h.textContent = curD;
+      c.appendChild(h);
+    }
+    var d = document.createElement('div');
+    d.className = 'field';
+    d.innerHTML = '<label>' + (i+1) + '. ' + item.q + '</label><div class="opcoes">' +
+      item.o.map(function(o, v) {
+        return '<label class="opcao"><input type="radio" name="fantp' + i + '" value="' + v + '" onchange="calcFantPac()"><div class="check-mark">✓</div><span class="opcao-texto">' + o + '</span></label>';
+      }).join('') + '</div>';
+    c.appendChild(d);
+  });
+}
+
+// ===== CÁLCULOS =====
+function getRadio(prefix, n) {
+  var vals = [];
+  for (var i = 0; i < n; i++) {
+    var el = document.querySelector('input[name="' + prefix + i + '"]:checked');
+    vals.push(el ? parseInt(el.value) : 0);
+  }
+  return vals;
+}
+
+function calcFantPac() {
+  var vals = getRadio('fantp', 25);
+  var total = vals.reduce(function(a,b){return a+b;},0) * 2;
+  var box = document.getElementById('fantScoreBox');
+  var num = document.getElementById('fantScoreNum');
+  var lbl = document.getElementById('fantScoreLabel');
+  box.style.display = 'block';
+  num.textContent = total;
+  var interp = total<=39?'Excelente':total<=59?'Bom':total<=69?'Regular':total<=84?'Precisa melhorar':'Muito ruim';
+  lbl.textContent = interp;
+  box.style.background = total<=59?'var(--verde-bg)':total<=69?'var(--laranja-bg)':'#fbeaea';
+  box.style.borderColor = total<=59?'var(--verde-borda)':total<=69?'var(--laranja-borda)':'#ef9a9a';
+  num.style.color = total<=59?'var(--verde)':total<=69?'var(--laranja)':'#c62828';
+  lbl.style.color = num.style.color;
+}
+
+function calcPHQ9Pac() {
+  var vals = getRadio('phq9p', 9);
+  var total = vals.reduce(function(a,b){return a+b;},0);
+  var box = document.getElementById('phq9ScoreBox');
+  box.style.display = 'block';
+  document.getElementById('phq9ScoreNum').textContent = total;
+  var interp = total<=4?'Mínima':total<=9?'Leve':total<=14?'Moderada':total<=19?'Moderadamente severa':'Severa';
+  document.getElementById('phq9ScoreLabel').textContent = interp;
+}
+
+function calcGAD7Pac() {
+  var vals = getRadio('gad7p', 7);
+  var total = vals.reduce(function(a,b){return a+b;},0);
+  var box = document.getElementById('gad7ScoreBox');
+  box.style.display = 'block';
+  document.getElementById('gad7ScoreNum').textContent = total;
+  var interp = total<=4?'Mínima':total<=9?'Leve':total<=14?'Moderada':'Severa';
+  document.getElementById('gad7ScoreLabel').textContent = interp;
+}
+
+function updateRodaPac(i, val) {
+  document.getElementById('rodapv' + i).textContent = val;
+  desenharRodaPac();
+}
+
+function desenharRodaPac() {
+  var canvas = document.getElementById('rodaCanvasPac');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d'), cx=140, cy=140, r=110, n=RODA_AREAS.length;
+  ctx.clearRect(0,0,280,280);
+  for (var ring=1; ring<=5; ring++) {
+    ctx.beginPath();
+    for (var i=0; i<n; i++) {
+      var ang=(i/n)*2*Math.PI-Math.PI/2, rr=(ring/5)*r;
+      i===0?ctx.moveTo(cx+rr*Math.cos(ang),cy+rr*Math.sin(ang)):ctx.lineTo(cx+rr*Math.cos(ang),cy+rr*Math.sin(ang));
+    }
+    ctx.closePath(); ctx.strokeStyle='#ffe0b2'; ctx.lineWidth=1; ctx.stroke();
+  }
+  for (var i=0; i<n; i++) {
+    var ang=(i/n)*2*Math.PI-Math.PI/2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*Math.cos(ang),cy+r*Math.sin(ang));
+    ctx.strokeStyle='#ffcc80'; ctx.lineWidth=1; ctx.stroke();
+  }
+  var vals = RODA_AREAS.map(function(_,j) { return parseInt(document.getElementById('rodap'+j)?document.getElementById('rodap'+j).value||5:5); });
+  ctx.beginPath();
+  vals.forEach(function(v,i) {
+    var ang=(i/n)*2*Math.PI-Math.PI/2, rr=(v/10)*r;
+    i===0?ctx.moveTo(cx+rr*Math.cos(ang),cy+rr*Math.sin(ang)):ctx.lineTo(cx+rr*Math.cos(ang),cy+rr*Math.sin(ang));
+  });
+  ctx.closePath(); ctx.fillStyle='rgba(230,81,0,0.2)'; ctx.fill();
+  ctx.strokeStyle='var(--laranja)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle='#5c5a55'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+  RODA_AREAS.forEach(function(area,i) {
+    var ang=(i/n)*2*Math.PI-Math.PI/2;
+    ctx.fillText(area.split(' ')[0], cx+(r+14)*Math.cos(ang), cy+(r+14)*Math.sin(ang)+3);
+  });
+}
+
+function calcIPAQPac() {}
+
+// ===== RESUMO ANTES DE ENVIAR =====
+function montarResumo() {
+  var div = document.getElementById('resumoScores');
+  var itens = [];
+
+  if (TESTES.indexOf('fantastico') >= 0) {
+    var v = getRadio('fantp',25).reduce(function(a,b){return a+b;},0)*2;
+    itens.push({label:'Fantástico', score: v+'/100'});
+  }
+  if (TESTES.indexOf('phq9') >= 0) {
+    var v = getRadio('phq9p',9).reduce(function(a,b){return a+b;},0);
+    itens.push({label:'PHQ-9 (Depressão)', score: v+'/27'});
+  }
+  if (TESTES.indexOf('gad7') >= 0) {
+    var v = getRadio('gad7p',7).reduce(function(a,b){return a+b;},0);
+    itens.push({label:'GAD-7 (Ansiedade)', score: v+'/21'});
+  }
+  if (TESTES.indexOf('roda') >= 0) {
+    var vals = RODA_AREAS.map(function(_,j){return parseInt(document.getElementById('rodap'+j)?document.getElementById('rodap'+j).value||5:5);});
+    var media = (vals.reduce(function(a,b){return a+b;},0)/vals.length).toFixed(1);
+    itens.push({label:'Roda da vida', score: 'Média '+media+'/10'});
+  }
+
+  div.innerHTML = itens.length > 0 ?
+    '<p style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Seus resultados</p>' +
+    itens.map(function(item) {
+      return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px">' +
+        '<span style="color:var(--text2)">' + item.label + '</span>' +
+        '<strong style="color:var(--verde)">' + item.score + '</strong></div>';
+    }).join('') : '<p style="color:var(--text3);font-size:13px">Tudo preenchido!</p>';
+}
+
+// ===== ENVIO =====
+async function enviarRespostas() {
+  var btn = document.getElementById('btnEnviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  var rodaVida = {};
+  RODA_AREAS.forEach(function(a,i) {
+    rodaVida[a] = parseInt(document.getElementById('rodap'+i)?document.getElementById('rodap'+i).value||5:5);
+  });
+
+  var dados = {
+    action: 'salvarRespostasPaciente',
+    cpf: CPF_PAC,
+    nome: document.getElementById('pacNome').value,
+    dnasc: document.getElementById('pacDnasc').value,
+    data: new Date().toLocaleDateString('pt-BR'),
+    testes: TESTES.join(','),
+    fantasticoTotal: TESTES.indexOf('fantastico')>=0 ? getRadio('fantp',25).reduce(function(a,b){return a+b;},0)*2 : null,
+    phq9Total: TESTES.indexOf('phq9')>=0 ? getRadio('phq9p',9).reduce(function(a,b){return a+b;},0) : null,
+    gad7Total: TESTES.indexOf('gad7')>=0 ? getRadio('gad7p',7).reduce(function(a,b){return a+b;},0) : null,
+    auditTotal: TESTES.indexOf('audit')>=0 ? getRadio('auditp',10).reduce(function(a,b){return a+b;},0) : null,
+    fagerTotal: TESTES.indexOf('fager')>=0 ? FAGER_DATA.map(function(item,i){return item.v[parseInt(document.querySelector('input[name="fagerp'+i+'"]:checked')?document.querySelector('input[name="fagerp'+i+'"]:checked').value||0:0)]||0;}).reduce(function(a,b){return a+b;},0) : null,
+    stopbangTotal: TESTES.indexOf('stopbang')>=0 ? getRadio('sbp',8).reduce(function(a,b){return a+b;},0) : null,
+    epworthTotal: TESTES.indexOf('epworth')>=0 ? getRadio('epwp',8).reduce(function(a,b){return a+b;},0) : null,
+    rodaVida: TESTES.indexOf('roda')>=0 ? JSON.stringify(rodaVida) : null
+  };
+
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify(dados)
+    });
+    document.querySelectorAll('.secao').forEach(function(s){s.classList.remove('ativa');});
+    document.getElementById('progresso').style.display = 'none';
+    document.getElementById('secSucesso').style.display = 'block';
+  } catch(e) {
+    alert('Erro ao enviar. Verifique sua conexão e tente novamente.');
+    btn.disabled = false;
+    btn.textContent = 'Enviar respostas ✓';
+  }
+}
+
+// ===== INICIALIZAÇÃO =====
+window.onload = function() {
+  atualizarProgresso();
+  // Pré-construir formulários ativos
+  if (TESTES.indexOf('fantastico')>=0) buildFantastico();
+  if (TESTES.indexOf('roda')>=0) buildRoda();
+  if (TESTES.indexOf('phq9')>=0) buildOpcoes('phq9Qs', PHQ9_QS, FREQ4_OPTS, 'phq9p', 'calcPHQ9Pac()');
+  if (TESTES.indexOf('gad7')>=0) buildOpcoes('gad7Qs', GAD7_QS, FREQ4_OPTS, 'gad7p', 'calcGAD7Pac()');
+  if (TESTES.indexOf('audit')>=0) buildCustomOpcoes('auditQs', AUDIT_DATA, 'auditp', '');
+  if (TESTES.indexOf('fager')>=0) buildCustomOpcoes('fagerQs', FAGER_DATA, 'fagerp', '');
+  if (TESTES.indexOf('stopbang')>=0) buildYesNo('stopbangQs', STOPBANG_QS, 'sbp', '');
+  if (TESTES.indexOf('epworth')>=0) buildOpcoes('epworthQs', EPWORTH_QS, EPWORTH_OPTS, 'epwp', '');
+  if (TESTES.indexOf('ipaq')>=0) buildIPAQ();
+
+  // Preencher nome se vier da URL
+  var nomeUrl = urlParams.get('nome');
+  if (nomeUrl) document.getElementById('pacNome').value = decodeURIComponent(nomeUrl);
+  if (CPF_PAC) {
+    // Estimar tempo
+    var n = TESTES.length;
+    document.getElementById('tempoEstimado').textContent = (n * 3) + ' minutos';
+  }
+};
+</script>
+</body>
+</html>

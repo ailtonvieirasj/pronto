@@ -84,7 +84,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15
     <div class="card">
       <div class="card-title">Identificação</div>
       <div class="field">
-        <label>Seu nome completo</label>
+        <label>Seu CPF <span style="color:#c62828">*</span></label>
+        <input type="text" id="pacCPF" placeholder="Apenas números" maxlength="11" oninput="this.value=this.value.replace(/[^0-9]/,'')" />
+        <small style="color:var(--text3);font-size:12px">Necessário para vincular suas respostas ao seu prontuário</small>
+      </div>
+      <div class="field">
+        <label>Seu nome completo <span style="color:#c62828">*</span></label>
         <input type="text" id="pacNome" placeholder="Nome completo" />
       </div>
       <div class="field">
@@ -406,8 +411,13 @@ function voltarDe(secId) {
 }
 
 function iniciar() {
+  var cpf = document.getElementById('pacCPF') ? document.getElementById('pacCPF').value.replace(/\D/g,'') : CPF_PAC;
   var nome = document.getElementById('pacNome').value.trim();
+  if (!cpf || cpf.length < 11) { alert('Por favor, informe seu CPF (11 dígitos).'); return; }
   if (!nome) { alert('Por favor, informe seu nome.'); return; }
+  // Se CPF veio da URL, usar o da URL; senão usar o digitado
+  if (!CPF_PAC) window._cpfPaciente = cpf;
+  else window._cpfPaciente = CPF_PAC;
   irPara(secoesAtivas[1]);
 }
 
@@ -649,7 +659,7 @@ async function enviarRespostas() {
 
   var dados = {
     action: 'salvarRespostasPaciente',
-    cpf: CPF_PAC,
+    cpf: window._cpfPaciente || CPF_PAC || document.getElementById('pacCPF').value.replace(/\D/g,''),
     nome: document.getElementById('pacNome').value,
     dnasc: document.getElementById('pacDnasc').value,
     data: new Date().toLocaleDateString('pt-BR'),
@@ -696,6 +706,15 @@ window.onload = function() {
   // Preencher nome se vier da URL
   var nomeUrl = urlParams.get('nome');
   if (nomeUrl) document.getElementById('pacNome').value = decodeURIComponent(nomeUrl);
+  // Se CPF veio da URL, esconder campo e mostrar nome
+  if (CPF_PAC) {
+    var cpfField = document.getElementById('pacCPF');
+    if (cpfField) {
+      cpfField.value = CPF_PAC;
+      cpfField.closest('.field').style.display = 'none';
+    }
+    window._cpfPaciente = CPF_PAC;
+  }
   if (CPF_PAC) {
     // Estimar tempo
     var n = TESTES.length;

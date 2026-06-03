@@ -623,6 +623,7 @@ async function sheetsPost(data) {
   try {
     const r = await fetch(SHEETS_URL, {
       method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=UTF-8'},
       body: JSON.stringify(data)
     });
     return await r.json();

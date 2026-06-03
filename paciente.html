@@ -677,6 +677,7 @@ async function enviarRespostas() {
   try {
     await fetch(SHEETS_URL, {
       method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=UTF-8'},
       body: JSON.stringify(dados)
     });
     document.querySelectorAll('.secao').forEach(function(s){s.classList.remove('ativa');});

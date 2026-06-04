@@ -453,9 +453,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
       </div>
       <p style="font-size:11px;font-weight:600;color:var(--text-2);margin:8px 0 5px;text-transform:uppercase;letter-spacing:.06em">Laboratoriais</p>
       <div class="check-group" style="margin-bottom:10px">
-        <button type="button" id="btnLabPadrao" class="check-pill green" onclick="selecionarLaboratorial('padrao',this)">Laboratoriais padrão</button>
-        <button type="button" id="btnLabEstendido" class="check-pill green" onclick="selecionarLaboratorial('estendido',this)">Laboratoriais estendido</button>
-        <button type="button" id="btnLabMinimos" class="check-pill green" onclick="selecionarLaboratorial('minimos',this)">Laboratoriais mínimos</button>
+        <button type="button" id="btnLabPadrao" class="check-pill green" onclick="selecionarLaboratorial('padrao',this)">Perfil estendido</button>
+        <button type="button" id="btnLabEstendido" class="check-pill green" onclick="selecionarLaboratorial('estendido',this)">Perfil mínimo</button>
       </div>
       <div class="field"><label>Observacoes adicionais</label><textarea id="obsNutr" placeholder="Qualquer dado clinico adicional..." style="min-height:52px"></textarea></div>
     </div>
@@ -1496,10 +1495,9 @@ function selecionarLaboratorial(tipo, btn) {
 }
 function getLaboratoriaisAtivos() {
   var ativos = [];
-  if (document.getElementById('lab_padrao')) ativos.push('Laboratoriais padrão (Hemograma completo, Glicemia, HbA1c, Colesterol total e frações, Triglicérides, TSH, Creatinina, TGO, TGP, GGT, Ureia, Ácido úrico)');
-  if (document.getElementById('lab_estendido')) ativos.push('Laboratoriais estendido (Insulina + HOMA-IR, T3+T4+TSH, Testosterona total, Cortisol matinal, Vitamina D, B12 + folato, Ferritina)');
-  if (document.getElementById('lab_minimos')) ativos.push('Laboratoriais mínimos (Hemograma completo, Glicemia, TSH, Creatinina)');
-  return ativos.join('; ');
+  if (document.getElementById('lab_padrao')) ativos.push('PERFIL ESTENDIDO (solicitar): Hemograma completo, Eritropoetina, Ferritina, Ferro sérico, TIBC, Transferrina, Glicemia de jejum, HbA1c, Insulina de jejum, HOMA-IR, HOMA-Beta, Colesterol total, LDL-C, HDL-C, Não-HDL-C, Triglicérides, Apolipoproteína A1, Apolipoproteína B, Lipoproteína(a), Homocisteína, PCR ultrassensível, VHS, Ácido úrico, Ureia, Creatinina, TFG, Cistatina C, TGO, TGP, Gama-GT, Fosfatase alcalina, Bilirrubinas totais e frações, Proteínas totais e frações (Albumina/Globulina), Creatinoquinase (CK), LDH, Amilase, Lipase, TSH, T4 livre, T3 livre, T3 reverso, Anti-TPO, Anticorpos anti-tireoglobulina, Cortisol basal (8h), DHEA, DHEA-S, Testosterona total, Testosterona livre, SHBG, Di-hidrotestosterona (DHT), Estradiol, Progesterona, LH, FSH, Prolactina, IGF-1 (Somatomedina C), IGFBP-3, Vitamina B12, Ácido fólico (B9), Vitamina D (25-OH), Vitamina A, Vitamina E, Vitamina K1, Vitamina C, Zinco sérico, Magnésio sérico, Magnésio eritrocitário, Cobre sérico, Selênio sérico, Cálcio total, Cálcio iônico, Fósforo, Sódio, Potássio, Cloro, Coenzima Q10, Cortisol salivar curva 4 amostras, IgE total, Painel de intolerância alimentar IgG, EAS de urina, Relação albumina/creatinina urinária (RAC), EPF, Sangue oculto nas fezes, Calprotectina fecal');
+  if (document.getElementById('lab_estendido')) ativos.push('PERFIL MÍNIMO (solicitar): Hemograma completo, Glicemia de jejum, HbA1c, Insulina de jejum, Colesterol total, LDL-C, HDL-C, Triglicérides, Ureia, Creatinina, TFG, TGO (AST), TGP (ALT), Gama-GT, Fosfatase alcalina, PCR ultrassensível, Ácido úrico, TSH, T4 livre, Testosterona total, Vitamina D (25-OH), Vitamina B12, Ferritina, Magnésio sérico, Sódio, Potássio, Cálcio total, EAS de urina');
+  return ativos.join(' | ');
 }
 // ===== FIM LABORATORIAIS BOTOES =====
 

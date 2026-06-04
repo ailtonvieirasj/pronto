@@ -451,15 +451,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
         <label class="check-pill green"><input type="checkbox" id="exEco"> Ecocardiograma</label>
         <label class="check-pill green"><input type="checkbox" id="exPolisom"> Polissonografia</label>
       </div>
-      <p style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Laboratorial estendido</p>
+      <p style="font-size:11px;font-weight:600;color:var(--text-2);margin:8px 0 5px;text-transform:uppercase;letter-spacing:.06em">Laboratoriais</p>
       <div class="check-group" style="margin-bottom:10px">
-        <label class="check-pill green"><input type="checkbox" id="exInsulin"> Insulina + HOMA-IR</label>
-        <label class="check-pill green"><input type="checkbox" id="exT3T4"> T3+T4+TSH</label>
-        <label class="check-pill green"><input type="checkbox" id="exTestos"> Testosterona</label>
-        <label class="check-pill green"><input type="checkbox" id="exCortis"> Cortisol</label>
-        <label class="check-pill green"><input type="checkbox" id="exVitD"> Vitamina D</label>
-        <label class="check-pill green"><input type="checkbox" id="exB12"> B12 + folato</label>
-        <label class="check-pill green"><input type="checkbox" id="exFerri"> Ferritina</label>
+        <button type="button" id="btnLabPadrao" class="check-pill green" onclick="selecionarLaboratorial('padrao',this)">Laboratoriais padrão</button>
+        <button type="button" id="btnLabEstendido" class="check-pill green" onclick="selecionarLaboratorial('estendido',this)">Laboratoriais estendido</button>
+        <button type="button" id="btnLabMinimos" class="check-pill green" onclick="selecionarLaboratorial('minimos',this)">Laboratoriais mínimos</button>
       </div>
       <div class="field"><label>Observacoes adicionais</label><textarea id="obsNutr" placeholder="Qualquer dado clinico adicional..." style="min-height:52px"></textarea></div>
     </div>
@@ -760,7 +756,7 @@ Descricao: ${g('compAlim')||'nao informada'}
 Medicamentos orexigenos: ${g('medOrexi')||'nenhum'}
 AVALIACAO ESPORTIVA: Treino: ${g('treino')||'nao informado'} | Tempo: ${g('tempTreino')||'nao informado'}
 Suplementacao: ${g('suple')||'nenhuma'}
-INVESTIGACAO COMPLEMENTAR: ${getCheckedLabels(['exErgoespiro','exErgom','exEco','exPolisom','exInsulin','exT3T4','exTestos','exCortis','exVitD','exB12','exFerri'])||'nenhuma marcada'}
+INVESTIGACAO COMPLEMENTAR: ${getCheckedLabels(['exErgoespiro','exErgom','exEco','exPolisom'])||'nenhuma marcada'} | Laboratoriais selecionados: ${getLaboratoriaisAtivos()||'nenhum'}
 OBS: ${g('obsNutr')||'nenhuma'}`:''
   const cannabisBloco=moduleState.cannabis?`
 === MODULO CANNABIS MEDICINAL ===
@@ -1478,6 +1474,34 @@ function getExamesBloco() {
   return '\n=== EXAMES ANEXADOS E INTERPRETADOS ===\n' + _interpretacaoExames;
 }
 // ===== FIM UPLOAD =====
+
+// ===== LABORATORIAIS BOTOES =====
+function selecionarLaboratorial(tipo, btn) {
+  var isActive = btn.style.background === 'var(--green)';
+  btn.style.background = isActive ? '' : 'var(--green)';
+  btn.style.color = isActive ? '' : '#fff';
+  btn.style.borderColor = isActive ? '' : 'var(--green)';
+  var hiddenId = 'lab_' + tipo;
+  var existing = document.getElementById(hiddenId);
+  if (existing) {
+    existing.parentElement.removeChild(existing);
+  } else {
+    var panelNutr = document.getElementById('panelNutr');
+    var hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.id = hiddenId;
+    hidden.value = tipo;
+    panelNutr.appendChild(hidden);
+  }
+}
+function getLaboratoriaisAtivos() {
+  var ativos = [];
+  if (document.getElementById('lab_padrao')) ativos.push('Laboratoriais padrão (Hemograma completo, Glicemia, HbA1c, Colesterol total e frações, Triglicérides, TSH, Creatinina, TGO, TGP, GGT, Ureia, Ácido úrico)');
+  if (document.getElementById('lab_estendido')) ativos.push('Laboratoriais estendido (Insulina + HOMA-IR, T3+T4+TSH, Testosterona total, Cortisol matinal, Vitamina D, B12 + folato, Ferritina)');
+  if (document.getElementById('lab_minimos')) ativos.push('Laboratoriais mínimos (Hemograma completo, Glicemia, TSH, Creatinina)');
+  return ativos.join('; ');
+}
+// ===== FIM LABORATORIAIS BOTOES =====
 
 // ===== BUSCA POR NOME =====
 var _pacientesSheets = [];

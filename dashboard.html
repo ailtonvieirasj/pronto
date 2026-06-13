@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. Ailton — Central</title>
+<style>
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface2: #f1f4f8;
+  --border: #e4e9f0;
+  --text: #1c2333;
+  --text2: #6b7a99;
+  --text3: #a8b4cc;
+  --green: #059669;
+  --green-bg: #ecfdf5;
+  --green-light: #10b981;
+  --green-border: #a7f3d0;
+  --purple: #7c3aed;
+  --purple-bg: #f5f3ff;
+  --purple-border: #ddd6fe;
+  --blue: #2563eb;
+  --blue-bg: #eff6ff;
+  --blue-border: #bfdbfe;
+  --amber: #d97706;
+  --amber-bg: #fffbeb;
+  --amber-border: #fde68a;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --red-border: #fecaca;
+  --radius: 12px;
+  --shadow: 0 1px 4px rgba(28,35,51,.06), 0 0 0 1px var(--border);
+  --font: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; padding-top: 76px; }
+
+/* HEADER */
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; }
+.header h1 { font-size: 16px; font-weight: 700; color: var(--text); }
+.header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+.clock { font-size: 22px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+.date-display { font-size: 11px; color: var(--text2); text-align: right; margin-top: 1px; }
+
+/* GRID */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-full { grid-column: 1 / -1; }
+
+/* CARDS */
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; cursor: pointer; user-select: none; transition: background .12s; }
+.card-header:hover { background: var(--surface2); }
+.card-header-left { display: flex; align-items: center; gap: 10px; }
+.card-icon { font-size: 16px; }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.card-subtitle { font-size: 11px; color: var(--text2); margin-top: 1px; }
+.card-toggle { color: var(--text3); font-size: 11px; transition: transform .2s; }
+.card-toggle.open { transform: rotate(180deg); }
+.card-body { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+.card-body.open { display: block; }
+
+/* BADGE */
+.badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; letter-spacing: .03em; }
+.badge-green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+.badge-gray { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+
+/* LINKS */
+.link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 11px; }
+.link-btn { display: flex; align-items: center; gap: 7px; padding: 9px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); text-decoration: none; font-size: 12px; font-weight: 500; transition: all .12s; cursor: pointer; }
+.link-btn:hover { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
+.link-btn .icon { font-size: 15px; }
+
+/* CALENDAR TABLE */
+.cal-table { width: 100%; border-collapse: collapse; margin-top: 11px; font-size: 12px; }
+.cal-table th { text-align: left; color: var(--text3); font-weight: 600; padding: 5px 8px; text-transform: uppercase; letter-spacing: .06em; font-size: 10px; border-bottom: 1px solid var(--border); }
+.cal-table td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.cal-table tr:last-child td { border-bottom: none; }
+.cal-table tr.today td { background: var(--green-bg); }
+.cal-table .post-title { font-weight: 500; color: var(--text); }
+.cal-table .post-date { color: var(--text2); white-space: nowrap; }
+
+/* CHECKLIST */
+.checklist { margin-top: 11px; display: flex; flex-direction: column; gap: 5px; }
+.check-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: var(--surface2); border-radius: 8px; font-size: 12px; cursor: pointer; transition: opacity .15s; border: 1px solid transparent; }
+.check-item:hover { border-color: var(--border); }
+.check-item.done { opacity: .45; }
+.check-item.done .check-label { text-decoration: line-through; color: var(--text2); }
+.check-box { width: 15px; height: 15px; border-radius: 4px; border: 2px solid var(--text3); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.check-item.done .check-box { background: var(--green); border-color: var(--green); }
+.check-item.done .check-box::after { content: '✓'; font-size: 9px; color: #fff; }
+.check-label { flex: 1; color: var(--text); }
+.check-tag { font-size: 10px; color: var(--text3); }
+
+/* METRICS */
+.metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 11px; }
+.metric { background: var(--surface2); border-radius: 8px; padding: 10px 12px; border: 1px solid var(--border); }
+.metric-value { font-size: 20px; font-weight: 700; color: var(--green); }
+.metric-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.metric-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* PROFILE ROW */
+.profile-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.profile-row:last-child { border-bottom: none; }
+.profile-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.profile-handle { font-size: 11px; color: var(--text2); }
+.profile-stats { display: flex; gap: 10px; font-size: 11px; color: var(--text2); }
+.profile-stats span b { color: var(--text); }
+
+/* SECTION TITLE */
+.section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); margin: 13px 0 6px; }
+
+/* PENDENCIAS */
+.pend-item { display: flex; align-items: flex-start; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text); line-height: 1.5; }
+.pend-item:last-child { border-bottom: none; }
+.pend-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.pend-dot.urgent { background: var(--red); }
+.pend-dot.normal { background: var(--amber); }
+.pend-dot.low { background: var(--text3); }
+.pend-done { opacity: .4; }
+.pend-done .pend-label { text-decoration: line-through; }
+
+/* DIVIDER */
+.sphere-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--text3); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+.sphere-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* STATUS ROW (Ton) */
+.status-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 7px; background: var(--surface2); border: 1px solid var(--border); margin-bottom: 5px; font-size: 12px; }
+.status-row:last-child { margin-bottom: 0; }
+
+/* ==================== CHAT PANEL ==================== */
+#chatToggle {
+  position: fixed; bottom: 22px; right: 22px; width: 48px; height: 48px;
+  border-radius: 50%; background: var(--green); border: none; font-size: 20px;
+  cursor: pointer; z-index: 150; box-shadow: 0 4px 16px rgba(5,150,105,.3);
+  transition: transform .2s, background .15s; display: flex; align-items: center; justify-content: center; color: #fff;
+}
+#chatToggle:hover { transform: scale(1.08); background: #047857; }
+
+#chatPanel {
+  position: fixed; bottom: 0; right: 0; width: 400px; height: 100vh;
+  background: var(--surface); border-left: 1px solid var(--border);
+  z-index: 140; display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform .28s ease;
+  box-shadow: -4px 0 24px rgba(28,35,51,.08);
+}
+#chatPanel.open { transform: translateX(0); }
+
+.chat-header {
+  padding: 13px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.chat-title { font-size: 13px; font-weight: 700; color: var(--text); }
+
+.chat-tabs {
+  display: flex; gap: 3px; padding: 7px 10px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0; overflow-x: auto;
+}
+.chat-tabs::-webkit-scrollbar { display: none; }
+.chat-tab {
+  padding: 4px 10px; border-radius: 6px; border: 1px solid transparent;
+  background: transparent; color: var(--text2); font-size: 11px; font-weight: 500;
+  cursor: pointer; white-space: nowrap; transition: all .12s;
+}
+.chat-tab.active { background: var(--green-bg); border-color: var(--green-border); color: var(--green); }
+.chat-tab:hover:not(.active) { background: var(--surface2); color: var(--text); }
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.msg {
+  max-width: 88%; padding: 9px 12px; border-radius: 10px;
+  font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+}
+.msg-user { align-self: flex-end; background: var(--green); color: #fff; }
+.msg-ai { align-self: flex-start; background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+.msg-thinking { align-self: flex-start; color: var(--text3); font-size: 11px; font-style: italic; padding: 3px 0; }
+
+.chat-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--text3); font-size: 12px; text-align: center; gap: 7px;
+}
+
+.chat-input-area {
+  padding: 10px; border-top: 1px solid var(--border);
+  display: flex; gap: 7px; align-items: flex-end; flex-shrink: 0;
+}
+#chatInput {
+  flex: 1; padding: 9px 11px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-size: 12px; resize: none;
+  height: 38px; max-height: 110px; overflow-y: auto;
+  font-family: var(--font); transition: border-color .12s;
+}
+#chatInput:focus { outline: none; border-color: var(--green-border); }
+#chatSend {
+  padding: 0 12px; height: 38px; background: var(--green);
+  border: none; border-radius: 8px; color: #fff; font-size: 16px;
+  cursor: pointer; flex-shrink: 0; transition: background .12s;
+}
+#chatSend:hover { background: #047857; }
+#chatSend:disabled { opacity: .35; cursor: not-allowed; }
+
+.chat-ctrl-btn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; padding: 3px 5px; font-size: 14px; transition: color .12s; border-radius: 4px;
+}
+.chat-ctrl-btn:hover { color: var(--text); background: var(--surface2); }
+
+#apiModal {
+  position: fixed; inset: 0; background: rgba(28,35,51,.4); z-index: 300;
+  display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+}
+#apiModal.open { display: flex; }
+
+.chat-quick-btns {
+  display: flex; flex-wrap: wrap; gap: 4px; padding: 7px 10px 0;
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.quick-btn {
+  padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text2); font-size: 10px; font-weight: 500;
+  cursor: pointer; transition: all .12s; white-space: nowrap;
+}
+.quick-btn:hover { border-color: var(--green-border); color: var(--green); background: var(--green-bg); }
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: 1fr; }
+  .grid-full { grid-column: 1; }
+  #chatPanel { width: 100%; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* CONTAS & FINANÇAS */
+.conta-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; background:var(--surface2); margin-bottom:6px; border-left:4px solid var(--border); transition:background .15s; }
+.conta-item.status-vencida { border-left-color:var(--red); background:#fff5f5; }
+.conta-item.status-urgente { border-left-color:var(--amber); background:#fffbf0; }
+.conta-item.status-proximo { border-left-color:#eab308; background:#fefce8; }
+.conta-item.status-ok { border-left-color:var(--green); }
+.conta-nome { font-size:13px; font-weight:600; color:var(--text); flex:1; }
+.conta-meta { font-size:11px; color:var(--text2); margin-top:2px; }
+.conta-valor { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; }
+.conta-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+.conta-badge.vencida { background:#fee2e2; color:var(--red); }
+.conta-badge.urgente { background:#fef3c7; color:var(--amber); }
+.conta-badge.proximo { background:#fef9c3; color:#a16207; }
+.conta-badge.ok { background:#dcfce7; color:var(--green); }
+.conta-del { background:none; border:none; cursor:pointer; color:var(--text3); font-size:15px; padding:2px 4px; border-radius:4px; }
+.conta-del:hover { color:var(--red); background:#fee2e2; }
+.conta-form { background:var(--surface2); border-radius:10px; padding:14px; margin-top:12px; border:1px dashed var(--border); }
+.conta-form-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.conta-form label { font-size:10px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:3px; }
+.conta-form input, .conta-form select { width:100%; padding:8px 10px; background:var(--surface); border:1px solid var(--border); border-radius:7px; color:var(--text); font-size:12px; box-sizing:border-box; }
+.conta-form-group { margin-bottom:8px; }
+.conta-totais { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+.conta-total-box { flex:1; min-width:80px; background:var(--surface2); border-radius:8px; padding:10px 8px; text-align:center; border:1px solid var(--border); }
+.conta-total-label { font-size:10px; color:var(--text2); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.conta-total-val { font-size:15px; font-weight:700; color:var(--text); margin-top:3px; }
+.conta-empty { font-size:12px; color:var(--text3); text-align:center; padding:16px 0; }
+.conta-filter-tabs { display:flex; gap:4px; margin-bottom:10px; flex-wrap:wrap; }
+.conta-filter-tab { font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; border:1px solid var(--border); background:var(--surface2); color:var(--text2); cursor:pointer; }
+.conta-filter-tab.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Dr. Ailton — Central</h1>
+    <p>CRM-SP 149.608 · CRM-MG 52.628 · RQE 121.870</p>
+  </div>
+  <div style="text-align:right">
+    <div class="clock" id="clock">00:00</div>
+    <div class="date-display" id="dateDisplay"></div>
+  </div>
+</div>
+
+<!-- ESFERA TRABALHO -->
+<div class="sphere-label">Trabalho</div>
+
+<div class="grid">
+
+  <!-- HOJE -->
+  <div class="card grid-full">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">📋</span>
+        <div>
+          <div class="card-title">Tarefas de Hoje</div>
+          <div class="card-subtitle" id="todaySubtitle">—</div>
+        </div>
+      </div>
+      <span class="badge badge-amber" id="pendBadge">—</span>
+    </div>
+    <div class="card-body open">
+      <div class="checklist">
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-label">Configurar horários nas Páginas de Agendamento (Google Calendar)</span>
+          <span class="check-tag">🔴 Urgente</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-label">Pedir autorização de depoimento para Tati e Isabela (Post 7 — Ter 16/06)</span>
+          <span class="check-tag">@menospeso</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-label">Postar Mounjaro "supercaneta" (arte + legenda prontas)</span>
+          <span class="check-tag">@menospeso</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-label">Story: enquete "Você já fez esse teste?" (cannabis)</span>
+          <span class="check-tag">@dr_ailtonvieira_</span>
+        </div>
+        <div class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-label">Verificar DMs: alguém mandou CANNABIS?</span>
+          <span class="check-tag">ManyChat</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TON — STATUS -->
+  <div class="card grid-full">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">🤖</span>
+        <div>
+          <div class="card-title">Secretária Ton — Status</div>
+          <div class="card-subtitle" id="tonSubtitle">Verificando...</div>
+        </div>
+      </div>
+      <span class="badge badge-green" id="tonStatusBadge">⏳ Verificando</span>
+    </div>
+    <div class="card-body open">
+
+      <div class="section-title">O que está funcionando</div>
+      <div class="status-row"><span>✅ Agendamento Consultório (online + presencial)</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Agendamento Menos Peso (15 min, videochamada)</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Coleta de dados antes de agendar (nome, e-mail, WhatsApp)</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Verifica agenda antes de confirmar (FASE A/B/C)</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Título: "Consulta de [Nome] - Online/Presencial/Menos Peso"</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Presencial: 72h de antecedência mínima</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Online: sem restrição de antecedência</span><span class="badge badge-green">OK</span></div>
+      <div class="status-row"><span>✅ Credencial Google Calendar renovada</span><span class="badge badge-green">OK</span></div>
+
+      <div class="section-title" style="margin-top:14px">Pendente de implementar</div>
+      <div class="status-row"><span>⏳ Pergunta de origem antes do link de pagamento</span><span class="badge badge-amber">Pendente</span></div>
+      <div class="status-row"><span>⏳ Leitura de comprovante (recusar "já paguei" sem foto)</span><span class="badge badge-amber">Pendente</span></div>
+      <div class="status-row"><span>⏳ Respostas mais concisas e focadas em fechar</span><span class="badge badge-amber">Pendente</span></div>
+      <div class="status-row"><span>⏳ Identidade: "fui criado pelo Dr. Ailton" + msg pós-pagamento</span><span class="badge badge-amber">Pendente</span></div>
+
+      <div class="section-title" style="margin-top:14px">Configuração do usuário pendente</div>
+      <div class="status-row" style="border-color:var(--red-border);background:var(--red-bg)"><span style="color:var(--red)">🔴 Adicionar horários nas Páginas de Agendamento do Google Calendar</span></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:7px;line-height:1.6">
+        calendar.google.com → Páginas de agendamento de horário → editar cada página:<br>
+        <b>Online + Menos Peso:</b> seg/qui/sex 7h–9h · qua 13h–14h · até 30/06/2026<br>
+        <b>Presencial:</b> ter 9h–12h · até 30/06/2026
+      </div>
+
+      <div class="section-title" style="margin-top:14px">Acesso rápido</div>
+      <div class="link-grid">
+        <a class="link-btn" href="https://wa.me/5538998643977" target="_blank"><span class="icon">💬</span> WhatsApp Ton</a>
+        <a class="link-btn" href="http://secretariaclinica.duckdns.org:5678/workflow/uXQjzTXLelK0lTjN" target="_blank"><span class="icon">⚙️</span> n8n Workflow</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRÓXIMAS CONSULTAS — DINÂMICO -->
+  <div class="card grid-full">
+    <div class="card-header open" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">📅</span>
+        <div>
+          <div class="card-title">Próximas Consultas</div>
+          <div class="card-subtitle" id="consultasSubtitle">Carregando do Google Calendar...</div>
+        </div>
+      </div>
+      <span class="card-toggle open">▼</span>
+    </div>
+    <div class="card-body open" id="consultasBody">
+      <div style="font-size:12px;color:var(--text2);text-align:center;padding:16px 0">⏳ Buscando agenda...</div>
+    </div>
+  </div>
+
+  <!-- ECOSSISTEMA DIGITAL -->
+  <div class="card grid-full">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">📱</span>
+        <div>
+          <div class="card-title">Ecossistema Digital</div>
+          <div class="card-subtitle">4 perfis</div>
+        </div>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="profile-row">
+        <div><div class="profile-name">@dr_ailtonvieira_</div><div class="profile-handle">Marca pessoal — Medicina de Família</div></div>
+        <div class="profile-stats"><span>Reel CUDIT <b>413 views</b></span><span>não-seg <b>34.7%</b> 🔥</span></div>
+      </div>
+      <div class="profile-row">
+        <div><div class="profile-name">@menospeso.saudedigital</div><div class="profile-handle">Programa GLP-1 — Emagrecimento</div></div>
+        <div class="profile-stats"><span>3 posts</span><span>lançamento <b>13 compartilhamentos</b> 🔥</span></div>
+      </div>
+      <div class="profile-row">
+        <div><div class="profile-name">@efeitoentourage</div><div class="profile-handle">Cannabis Medicinal — reativar</div></div>
+        <div class="profile-stats"><span>~2-3k seguidores</span><span><span class="badge badge-amber">Pausado</span></span></div>
+      </div>
+      <div class="profile-row">
+        <div><div class="profile-name">Doutores na Cozinha</div><div class="profile-handle">Collab médicos — em planejamento</div></div>
+        <div class="profile-stats"><span><span class="badge badge-gray">Planejamento</span></span></div>
+      </div>
+      <div class="section-title">Links</div>
+      <div class="link-grid">
+        <a class="link-btn" href="https://www.instagram.com/dr_ailtonvieira_" target="_blank"><span class="icon">📸</span> @dr_ailtonvieira_</a>
+        <a class="link-btn" href="https://www.instagram.com/menospeso.saudedigital" target="_blank"><span class="icon">⚖️</span> @menospeso</a>
+        <a class="link-btn" href="https://ailtonvieirasj.github.io/pronto/cudit_form.html" target="_blank"><span class="icon">🌿</span> Formulário CUDIT</a>
+        <a class="link-btn" href="https://www.instagram.com/efeitoentourage" target="_blank"><span class="icon">🍃</span> @efeitoentourage</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDÁRIO MENOSPESO -->
+  <div class="card grid-full">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">📅</span>
+        <div>
+          <div class="card-title">Calendário @menospeso — Semana 1</div>
+          <div class="card-subtitle">10 a 16 de junho de 2026</div>
+        </div>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <table class="cal-table">
+        <thead><tr><th>Data</th><th>Hora</th><th>Post</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td class="post-date">Qua 10/06</td><td>20h</td><td class="post-title">Carrossel de Lançamento</td><td><span class="badge badge-green">✅ Publicado</span></td></tr>
+          <tr><td class="post-date">Qua 10/06</td><td>22h</td><td class="post-title">Gordura vs Músculo</td><td><span class="badge badge-green">✅ Publicado</span></td></tr>
+          <tr><td class="post-date">Qui 11/06</td><td>8h</td><td class="post-title">Mounjaro — supercaneta 🔥</td><td><span class="badge badge-green">✅ Publicado</span></td></tr>
+          <tr class="today"><td class="post-date">Sex 12/06</td><td>12h</td><td class="post-title">Como funciona (4 passos)</td><td><span class="badge badge-amber">⏰ Hoje</span></td></tr>
+          <tr><td class="post-date">Sáb 13/06</td><td>10h</td><td class="post-title">Por que criei o programa</td><td><span class="badge badge-gray">⏳ Arte pendente</span></td></tr>
+          <tr><td class="post-date">Dom 14/06</td><td>18h</td><td class="post-title">Não é falta de força de vontade</td><td><span class="badge badge-blue">🎨 Arte pronta</span></td></tr>
+          <tr><td class="post-date">Ter 16/06</td><td>7h</td><td class="post-title">Depoimento + vagas</td><td><span class="badge badge-red">⚠️ Autorização pendente</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MENOS PESO — OPERAÇÕES -->
+  <div class="card grid-full">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">⚖️</span>
+        <div>
+          <div class="card-title">Menos Peso — Operações</div>
+          <div class="card-subtitle">Programa GLP-1 · Pré-lançamento</div>
+        </div>
+      </div>
+      <span class="badge badge-amber">Testando funil</span>
+    </div>
+    <div class="card-body">
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric"><div class="metric-value">0</div><div class="metric-label">Pacientes ativos</div><div class="metric-sub">Aguardando testers</div></div>
+        <div class="metric"><div class="metric-value">2</div><div class="metric-label">Testers</div><div class="metric-sub">Tati + Isabela</div></div>
+        <div class="metric"><div class="metric-value" style="color:var(--amber)">R$1k</div><div class="metric-label">Budget anúncios</div><div class="metric-sub">Pós-validação</div></div>
+        <div class="metric"><div class="metric-value" style="color:var(--purple)">R$4.940</div><div class="metric-label">Projeção 20 pac/mês</div><div class="metric-sub">R$247 plano início</div></div>
+      </div>
+      <div class="section-title">Links operacionais</div>
+      <div class="link-grid">
+        <a class="link-btn" href="https://wa.me/5538998643977" target="_blank"><span class="icon">💬</span> WhatsApp Ton</a>
+        <a class="link-btn" href="https://calendar.app.google/mSX77fmx7WW6qQKd8" target="_blank"><span class="icon">📅</span> Agenda Menos Peso</a>
+        <a class="link-btn" href="https://checkout.nubank.com.br/t7tWiRfOFIbkzne" target="_blank"><span class="icon">💳</span> Checkout R$247</a>
+        <a class="link-btn" href="https://checkout.nubank.com.br/vYy1QUdvxWbkzne" target="_blank"><span class="icon">💳</span> Checkout R$397</a>
+      </div>
+      <div class="section-title">Testers — DM prontas</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px">Para Tati:</div>
+        <div id="msgTati" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:12px;color:var(--text);line-height:1.6">Oi Tati! Tudo bem? Queria te pedir um favor — estou lançando o Menos Peso, meu programa de acompanhamento com caneta emagrecedora, e você seria uma das primeiras testers. A ideia é você simular o fluxo como se fosse uma paciente nova: entrar em contato pelo WhatsApp do meu assistente digital, o Ton, e passar pelo processo todo. Me dá esse retorno? O número é (38) 99864-3977</div>
+        <button onclick="copiarTexto('msgTati', this)" style="margin-top:5px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;width:100%">📋 Copiar</button>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px">Para Isabela:</div>
+        <div id="msgIsabela" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:12px;color:var(--text);line-height:1.6">Oi Isa! Tudo bem? Lembra que te falei do Menos Peso? Estou na fase final antes do lançamento e queria que você fosse uma das testers. É simples: você entra em contato pelo WhatsApp do meu assistente, o Ton, como se fosse uma paciente chegando pela primeira vez, e me passa o feedback do que achou. Topa? O número é (38) 99864-3977</div>
+        <button onclick="copiarTexto('msgIsabela', this)" style="margin-top:5px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;width:100%">📋 Copiar</button>
+      </div>
+      <div class="section-title">Propostas de parceria</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px">Médicos (Doutores na Cozinha):</div>
+        <div id="propostaMedico" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:12px;color:var(--text);line-height:1.7;white-space:pre-line">Oi [Nome], foi um prazer te ter no Doutores na Cozinha!
+
+Queria te apresentar uma parceria com o Menos Peso, meu programa de acompanhamento médico com análogos de GLP-1 (caneta emagrecedora).
+
+É simples: quando você tiver um paciente com indicação para o tratamento, indica o programa com o seu cupom exclusivo. Para cada paciente que fechar, você recebe R$80 de comissão.
+
+Sem vínculo, sem contrato, sem obrigação de volume. Você indica quando fizer sentido clinicamente — o programa cuida do fluxo, do suporte e da consulta médica.
+
+Topo que seja?
+
+Dr. Ailton | @menospeso.saudedigital</div>
+        <button onclick="copiarTexto('propostaMedico', this)" style="margin-top:5px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;width:100%">📋 Copiar</button>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px">Embaixadoras (após resultado):</div>
+        <div id="propostaEmbaixadora" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px;font-size:12px;color:var(--text);line-height:1.7;white-space:pre-line">Oi [Nome]! Que resultado incrível — muito feliz com a sua evolução!
+
+Queria te propor algo: você teria um cupom exclusivo seu ([CUPOM_NOME]) que dá 50% de desconto para qualquer pessoa que você indicar para o Menos Peso. Para cada paciente que fechar com o seu cupom, você recebe R$50.
+
+A sua história virando indicação real. Topa?
+
+Dr. Ailton | @menospeso.saudedigital</div>
+        <button onclick="copiarTexto('propostaEmbaixadora', this)" style="margin-top:5px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;cursor:pointer;width:100%">📋 Copiar</button>
+      </div>
+      <div class="section-title">Cupons ativos</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.9">
+        <b style="color:var(--text)">MENOSPESO · FAMÍLIA · FAMILIA · INSTA100</b> — 100% desconto<br>
+        <b style="color:var(--text)">CUPOMAMIGO</b> — 50% desconto
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSULTÓRIO -->
+  <div class="card">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">🏥</span>
+        <div>
+          <div class="card-title">Consultório</div>
+          <div class="card-subtitle">Prontuário + agenda</div>
+        </div>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="link-grid" style="grid-template-columns:1fr">
+        <a class="link-btn" href="https://ailtonvieirasj.github.io/pronto/" target="_blank"><span class="icon">📋</span> Prontuário Eletrônico</a>
+        <a class="link-btn" href="https://ailtonvieirasj.github.io/pronto/cudit_form.html" target="_blank"><span class="icon">🌿</span> Formulário CUDIT</a>
+        <a class="link-btn" href="https://wa.me/5538998643977" target="_blank"><span class="icon">💬</span> WhatsApp Ton</a>
+        <div class="link-btn" onclick="abrirNF()" style="cursor:pointer"><span class="icon">🧾</span> Gerar texto NF</div>
+      </div>
+      <div class="section-title">Nota</div>
+      <div class="pend-item">
+        <div class="pend-dot urgent"></div>
+        <div>Psiquiatra 300k seguidores — quer entrar no Doutores na Cozinha. Preparar protocolo especial.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONVÊNIO -->
+  <div class="card">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">💼</span>
+        <div>
+          <div class="card-title">Convênio</div>
+          <div class="card-subtitle">Iron · Conexa · plano de saúde</div>
+        </div>
+      </div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="metrics-grid">
+        <div class="metric"><div class="metric-value">—</div><div class="metric-label">Atendimentos/mês</div><div class="metric-sub">Atualizar</div></div>
+        <div class="metric"><div class="metric-value">—</div><div class="metric-label">Produção R$</div><div class="metric-sub">Atualizar</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENDÊNCIAS -->
+  <div class="card grid-full">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left">
+        <span class="card-icon">⚠️</span>
+        <div>
+          <div class="card-title">Pendências do Ecossistema</div>
+          <div class="card-subtitle">Itens que precisam de ação</div>
+        </div>
+      </div>
+      <span class="badge badge-red">6 itens</span>
+    </div>
+    <div class="card-body open">
+      <div class="pend-item"><div class="pend-dot urgent"></div><div><b>Google Calendar:</b> Configurar horários nas Páginas de Agendamento (online, presencial, Menos Peso) — o Ton precisa disso para funcionar corretamente</div></div>
+      <div class="pend-item"><div class="pend-dot urgent"></div><div><b>Ton — Origem:</b> Adicionar pergunta "Como você chegou até o Dr. Ailton?" antes do link de pagamento</div></div>
+      <div class="pend-item"><div class="pend-dot urgent"></div><div><b>Ton — Comprovante:</b> Não confirmar pagamento por "já paguei" — exigir foto do comprovante</div></div>
+      <div class="pend-item"><div class="pend-dot normal"></div><div><b>Testers Menos Peso:</b> Pedir autorização para depoimento no Post 7 (Terça 16/06)</div></div>
+      <div class="pend-item"><div class="pend-dot normal"></div><div><b>Psiquiatra 300k:</b> Preparar protocolo especial para consulta</div></div>
+      <div class="pend-item"><div class="pend-dot low"></div><div><b>@efeitoentourage:</b> Auditoria e plano de reativação do perfil de cannabis</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- DOUTORES NA COZINHA -->
+<div class="card grid-full" style="margin-top:14px">
+  <div class="card-header" onclick="toggle(this)">
+    <div class="card-header-left">
+      <span class="card-icon">👨‍🍳</span>
+      <div>
+        <div class="card-title">Doutores na Cozinha</div>
+        <div class="card-subtitle">Edição 1 — Julho/2026 · Em planejamento</div>
+      </div>
+    </div>
+    <span class="badge badge-amber">3 ações urgentes</span>
+  </div>
+  <div class="card-body">
+    <div class="checklist">
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Enviar mensagem para Clara confirmando data</span><span class="check-tag">@psiqclara · 328k</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Proposta para buffet parceiro (espaço grátis por divulgação)</span><span class="check-tag">Espaço</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Buscar 1 homem com perfil ativo/visual (atualmente 2H · 9F)</span><span class="check-tag">Convidado</span></div>
+      <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Após buffet confirmado → disparar convites para os 12 convidados</span><span class="check-tag">Convites</span></div>
+    </div>
+    <div class="section-title">Lista de convidados — 11/12</div>
+    <table class="cal-table">
+      <thead><tr><th>Nome</th><th>Especialidade</th><th>Instagram</th><th>Fit</th></tr></thead>
+      <tbody>
+        <tr><td>Maria Clara Silveira</td><td>Psiquiatra</td><td>@psiqclara</td><td><span class="badge badge-amber">⚠️ Aguardando</span></td></tr>
+        <tr><td>Janniny Figueiredo</td><td>Família · Cannabis</td><td>@dra.nyna</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Márcio Nobre</td><td>Neurocirurgião</td><td>@marcionobre2204</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Michel Dias Lopes</td><td>Ortopedia · Esporte</td><td>@drmicheldiaslopes</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Cristiane Ferreira</td><td>Endocrinologista</td><td>@cristianemmferreira</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Gabriella Mendes</td><td>Psiquiatra · Cannabis</td><td>@dragabriellamendes_</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Letícia Brandão</td><td>Nutrologia</td><td>@dra.leticialbrandao</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Mariana Oliveira</td><td>Canabinoide</td><td>@dra.mari.oliveira</td><td><span class="badge badge-green">🟢 Fit alto</span></td></tr>
+        <tr><td>Halany Santana</td><td>Enfermeira · Acadêmica</td><td>@halany_santana</td><td><span class="badge badge-blue">🟡 Médio</span></td></tr>
+        <tr><td>Sara Machado</td><td>Médica</td><td>@saramachadocp</td><td><span class="badge badge-blue">🟡 Médio</span></td></tr>
+        <tr><td style="color:var(--text3)">+ 1 homem</td><td style="color:var(--text3)">A definir</td><td style="color:var(--text3)">—</td><td><span class="badge badge-red">🔴 Pendente</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ESFERA PESSOAL -->
+<div class="sphere-label" style="margin-top:24px">Pessoal</div>
+<div class="grid">
+  <div class="card">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left"><span class="card-icon">🏠</span><div><div class="card-title">Casa</div><div class="card-subtitle">Manutenção, estrutura</div></div></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body"><div style="font-size:12px;color:var(--text2);padding-top:4px">Adicione tarefas da casa aqui.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header" onclick="toggle(this)">
+      <div class="card-header-left"><span class="card-icon">❤️</span><div><div class="card-title">Saúde & Lazer</div><div class="card-subtitle">Rotina, estudos</div></div></div>
+      <span class="card-toggle">▼</span>
+    </div>
+    <div class="card-body"><div style="font-size:12px;color:var(--text2);padding-top:4px">Adicione metas de saúde e lazer aqui.</div></div>
+  </div>
+</div>
+
+<!-- ESFERA FINANÇAS -->
+<div class="sphere-label" style="margin-top:24px">💰 Contas & Finanças</div>
+<div class="card" style="margin-bottom:16px">
+  <div class="card-header open" onclick="toggle(this)" style="cursor:pointer">
+    <div class="card-header-left">
+      <span class="card-icon">💳</span>
+      <div>
+        <div class="card-title">Controle de Contas</div>
+        <div class="card-subtitle" id="contasSubtitle">Carregando...</div>
+      </div>
+    </div>
+    <span class="card-toggle open">▼</span>
+  </div>
+  <div class="card-body open">
+    <!-- Filtros -->
+    <div class="conta-filter-tabs">
+      <button class="conta-filter-tab active" onclick="filtrarContas('todas', this)">Todas</button>
+      <button class="conta-filter-tab" onclick="filtrarContas('Pessoal', this)">🏠 Pessoal</button>
+      <button class="conta-filter-tab" onclick="filtrarContas('Consultório', this)">🏥 Consultório</button>
+      <button class="conta-filter-tab" onclick="filtrarContas('Menos Peso', this)">⚖️ Menos Peso</button>
+    </div>
+
+    <!-- Lista -->
+    <div id="contasList"></div>
+
+    <!-- Totais -->
+    <div class="conta-totais" id="contasTotais"></div>
+
+    <!-- Formulário -->
+    <div class="conta-form" id="contaFormArea" style="display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">+ Nova Conta</div>
+      <div class="conta-form-row">
+        <div class="conta-form-group">
+          <label>Nome da conta</label>
+          <input id="cfNome" type="text" placeholder="ex: Aluguel Da Vinci" />
+        </div>
+        <div class="conta-form-group">
+          <label>Categoria</label>
+          <select id="cfCategoria">
+            <option value="Pessoal">🏠 Pessoal</option>
+            <option value="Consultório">🏥 Consultório</option>
+            <option value="Menos Peso">⚖️ Menos Peso</option>
+          </select>
+        </div>
+      </div>
+      <div class="conta-form-row">
+        <div class="conta-form-group">
+          <label>Valor (R$)</label>
+          <input id="cfValor" type="number" step="0.01" placeholder="0,00" />
+        </div>
+        <div class="conta-form-group">
+          <label>Dia de vencimento</label>
+          <input id="cfDia" type="number" min="1" max="31" placeholder="ex: 15" />
+        </div>
+      </div>
+      <div class="conta-form-group">
+        <label>Observação (opcional)</label>
+        <input id="cfObs" type="text" placeholder="ex: débito automático, boleto..." />
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="salvarConta()" style="flex:1;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Salvar</button>
+        <button onclick="toggleFormConta()" style="padding:9px 14px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer">Cancelar</button>
+      </div>
+    </div>
+
+    <button onclick="toggleFormConta()" id="btnAddConta" style="width:100%;margin-top:10px;padding:8px;background:var(--surface2);color:var(--blue);border:1px dashed var(--blue);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">+ Adicionar Conta</button>
+  </div>
+</div>
+
+<!-- MODAL NF -->
+<div id="nfModal" style="display:none;position:fixed;inset:0;background:rgba(28,35,51,.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px)">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:460px;margin:20px;box-shadow:0 16px 40px rgba(28,35,51,.15)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <h3 style="font-size:15px;font-weight:700">🧾 Gerar Texto da NF</h3>
+      <span onclick="fecharNF()" style="cursor:pointer;color:var(--text3);font-size:18px">✕</span>
+    </div>
+    <div style="margin-bottom:11px">
+      <label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Tomador</label>
+      <select id="nfTomador" style="width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px">
+        <option value="iron">Iron Trainers do Brasil Ltda — CNPJ 21.298.287/0001-58</option>
+        <option value="conexa">Conexa Saúde Serviços Médicos S.A. — CNPJ 27.092.748/0001-18</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+    <div style="margin-bottom:11px">
+      <label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Mês/Ano</label>
+      <input id="nfMes" type="text" placeholder="ex: maio/2026" style="width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px" />
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Valor (R$)</label>
+      <input id="nfValor" type="text" placeholder="ex: 9.040,00" style="width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px" />
+    </div>
+    <button onclick="gerarNF()" style="width:100%;padding:11px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:11px">Gerar →</button>
+    <div id="nfResultado" style="display:none">
+      <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Texto gerado:</div>
+      <textarea id="nfTexto" readonly style="width:100%;height:190px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:11px;resize:none;line-height:1.6"></textarea>
+      <button onclick="copiarNF()" id="btnCopiar" style="width:100%;padding:9px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-top:7px">📋 Copiar</button>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;font-size:11px;color:var(--text3);margin-top:28px;padding-top:14px;border-top:1px solid var(--border)">
+  Dr. Ailton Vieira · Central v2.0
+</div>
+
+<!-- CHAT -->
+<button id="chatToggle" onclick="toggleChat()" title="Chat com Claude">💬</button>
+
+<div id="chatPanel">
+  <div class="chat-header">
+    <span class="chat-title">💬 Central Dr. Ailton</span>
+    <div style="display:flex;gap:2px;align-items:center">
+      <button class="chat-ctrl-btn" onclick="openApiSettings()" title="API Key">⚙️</button>
+      <button class="chat-ctrl-btn" onclick="clearCurrentChat()" title="Limpar">🗑️</button>
+      <button class="chat-ctrl-btn" onclick="toggleChat()" title="Fechar" style="font-size:16px">✕</button>
+    </div>
+  </div>
+  <div class="chat-tabs">
+    <button class="chat-tab active" onclick="switchTab('geral',this)">🏠 Geral</button>
+    <button class="chat-tab" onclick="switchTab('ton',this)">🤖 Ton</button>
+    <button class="chat-tab" onclick="switchTab('conteudo',this)">📱 Conteúdo</button>
+    <button class="chat-tab" onclick="switchTab('estrategia',this)">📊 Estratégia</button>
+    <button class="chat-tab" onclick="switchTab('pessoal',this)">🏡 Pessoal</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-empty" id="chatEmpty">
+      <div style="font-size:32px">🤖</div>
+      <div style="font-weight:600;font-size:13px">O que está na sua cabeça?</div>
+      <div style="font-size:11px;margin-top:2px">Configure a API key em ⚙️</div>
+    </div>
+  </div>
+  <div class="chat-quick-btns">
+    <button class="quick-btn" onclick="quickInsert('consultorio')">🏥 Consultório</button>
+    <button class="quick-btn" onclick="quickInsert('doutores')">👨‍🍳 Doutores</button>
+    <button class="quick-btn" onclick="quickInsert('mocannabis')">🌿 MOCANNABIS</button>
+    <button class="quick-btn" onclick="quickInsert('percepcao')" style="border-color:var(--purple-border);color:var(--purple)">💡 Percepção</button>
+  </div>
+  <div class="chat-input-area">
+    <textarea id="chatInput" placeholder="Mensagem... (Enter envia)" onkeydown="handleChatKey(event)" oninput="autoResizeChat(this)"></textarea>
+    <button id="chatSend" onclick="sendMessage()">↑</button>
+  </div>
+</div>
+
+<div id="apiModal">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:380px;margin:20px;box-shadow:0 16px 40px rgba(28,35,51,.15)">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:7px">⚙️ API Key do Claude</h3>
+    <p style="font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.5">Salva só neste dispositivo. Vai direto para a API da Anthropic.</p>
+    <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="width:100%;padding:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;margin-bottom:11px" onkeydown="if(event.key==='Enter')saveApiKey()" />
+    <div style="display:flex;gap:7px">
+      <button onclick="saveApiKey()" style="flex:1;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Salvar</button>
+      <button onclick="closeApiSettings()" style="padding:9px 14px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Helpers
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.card-toggle');
+  body.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open');
+}
+function toggleCheck(item) {
+  item.classList.toggle('done');
+  const all = document.querySelectorAll('.check-item');
+  const done = document.querySelectorAll('.check-item.done');
+  const pending = all.length - done.length;
+  const badge = document.getElementById('pendBadge');
+  if (badge) badge.textContent = pending + ' pendentes';
+}
+
+// NF
+function abrirNF() { document.getElementById('nfModal').style.display = 'flex'; document.getElementById('nfResultado').style.display = 'none'; }
+function fecharNF() { document.getElementById('nfModal').style.display = 'none'; }
+document.getElementById('nfModal').addEventListener('click', function(e) { if (e.target === this) fecharNF(); });
+function gerarNF() {
+  const tomadorSel = document.getElementById('nfTomador').value;
+  const mes = document.getElementById('nfMes').value.trim();
+  const valor = document.getElementById('nfValor').value.trim();
+  if (!mes || !valor) { alert('Preencha o mês/ano e o valor.'); return; }
+  let tomadorInfo = '';
+  if (tomadorSel === 'iron') tomadorInfo = '\nTomador: IRON TRAINERS DO BRASIL LTDA\nCNPJ: 21.298.287/0001-58 | IM: 7.041.209-0';
+  else if (tomadorSel === 'conexa') tomadorInfo = '\nTomador: CONEXA SAÚDE SERVIÇOS MÉDICOS S.A.\nCNPJ: 27.092.748/0001-18';
+  const texto = `Atendimento Ambulatório de Especialidades\nServiços prestados pelo sócio em ${mes}.\nDr. Ailton Vieira de Souza Júnior - CRM 149608\n\n"Serviços prestados pelos próprios sócios no exercício da profissão regulamentada por legislação federal, isento de retenção do INSS conforme previsto no artigo 120, inciso III, 2 da IN/RFB nº 971/2009."\n\nVALOR: R$ ${valor}${tomadorInfo}\n\nDADOS BANCÁRIOS\nBANCO 260: NU PAGAMENTOS\nAgência 0001\nConta Corrente 19455098-7\nCNPJ 37786772/0001-00`;
+  document.getElementById('nfTexto').value = texto;
+  document.getElementById('nfResultado').style.display = 'block';
+  document.getElementById('btnCopiar').textContent = '📋 Copiar';
+}
+function copiarTexto(id, btn) {
+  const el = document.getElementById(id);
+  const text = el.innerText;
+  const orig = btn.textContent;
+  navigator.clipboard.writeText(text).then(() => { btn.textContent = '✅ Copiado!'; setTimeout(() => { btn.textContent = orig; }, 2000); }).catch(() => { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); btn.textContent = '✅ Copiado!'; setTimeout(() => { btn.textContent = orig; }, 2000); });
+}
+function copiarNF() { const txt = document.getElementById('nfTexto'); txt.select(); document.execCommand('copy'); const btn = document.getElementById('btnCopiar'); btn.textContent = '✅ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000); }
+
+// Chat
+const CHAT_TABS = {
+  geral: { system: `Você é o assistente pessoal do Dr. Ailton Vieira de Souza Júnior — médico de família, empreendedor e criador de conteúdo. CRM-SP 149.608 | CRM-MG 52.628 | RQE 121.870.\n\nContexto atual:\n- Consultório: online R$450 (videochamada) e presencial R$600. Horários: online/seg/qui/sex 7-9h + qua 13-14h; presencial terça 9-12h\n- Programa Menos Peso: GLP-1 (Ozempic, Wegovy, Mounjaro) — R$247 e R$397. 2 testers em andamento (Tati e Isabela)\n- Chatbot "Ton" via n8n + Z-API: agendamento automático com Google Calendar. Funcionando. Pendente: pergunta de origem, verificação de comprovante, respostas mais concisas\n- Perfis: @dr_ailtonvieira_ (marca pessoal), @menospeso.saudedigital (semana 1 de conteúdo), @efeitoentourage (cannabis — pausado)\n- Doutores na Cozinha: collab médicos, julho/2026, 11 de 12 convidados definidos\n\nSeja direto, conciso e prático. Você já conhece o Dr. Ailton.` },
+  ton: { system: `Você é o assistente técnico das automações do Dr. Ailton Vieira.\n\nChatbot "Ton" — estado atual:\n- n8n workflow uXQjzTXLelK0lTjN em secretariaclinica.duckdns.org:5678\n- Z-API para WhatsApp, AI Agent com Claude Sonnet\n- Google Calendar: Get Many Events + Create an event (credencial renovada 12/06/2026)\n- Consultório: coleta nome/email/WhatsApp antes de agendar; FASE A/B/C para verificar disponibilidade; título "Consulta de [Nome] - Online/Presencial"; presencial 72h antecedência; online sem restrição\n- Menos Peso: mesma coleta, título "Consulta de [Nome] - Menos Peso", duração 15min\n- Horários: online/MP = seg/qui/sex 7-9h + qua 13-14h; presencial = ter 9-12h; agenda até 30/06/2026\n\nPendente: pergunta de origem antes do link de pagamento; leitura de comprovante; respostas mais concisas; identidade "fui criado pelo Dr. Ailton"\n\nSeja técnico e direto.` },
+  conteudo: { system: `Você é o estrategista de conteúdo do Dr. Ailton Vieira.\n\n@dr_ailtonvieira_: marca pessoal, medicina de família, cannabis, estética\n@menospeso.saudedigital: semana 1 (10-16 jun/2026)\n  Publicados: lançamento + gordura vs músculo + Mounjaro\n  Agenda: Como funciona (Sex 12), Por que criei (Sáb—arte pendente), Força de vontade (Dom), Depoimento (Ter—autorização pendente)\n@efeitoentourage: cannabis — pausado\n\nTom: científico mas acessível. Público: adultos 25-50.` },
+  estrategia: { system: `Você é o consultor de negócios do Dr. Ailton Vieira.\n\nNegócios:\n1. Consultório: R$450 online / R$600 presencial\n2. Menos Peso (GLP-1): R$247/R$397. Meta: 20 pac/mês ≈ R$5k. Meta Ads pós-validação\n3. Convênio (Iron/Conexa): trabalho contratual\n4. Doutores na Cozinha: collab médicos — julho/2026\n\nParcerias: médicos R$80/indicação | embaixadoras 50% desc + R$50/indicação\n\nSeja estratégico e objetivo.` },
+  pessoal: { system: `Você é o assistente pessoal do Dr. Ailton Vieira — médico em Montes Claros/MG. Email: ailtonvieira.sj@gmail.com\nNesta aba: tarefas pessoais, casa, rotina, finanças, saúde, qualquer assunto não profissional.\nSeja acolhedor e prático.` }
+};
+let currentTab = 'geral';
+let chatHistory = {};
+let isSending = false;
+function initChat() {
+  Object.keys(CHAT_TABS).forEach(tab => { const saved = localStorage.getItem('chat_' + tab); chatHistory[tab] = saved ? JSON.parse(saved) : []; });
+  const key = localStorage.getItem('claude_api_key');
+  if (key) document.getElementById('apiKeyInput').value = key;
+  renderMessages();
+}
+function toggleChat() {
+  const panel = document.getElementById('chatPanel');
+  const btn = document.getElementById('chatToggle');
+  const isOpen = panel.classList.toggle('open');
+  btn.textContent = isOpen ? '✕' : '💬';
+  if (isOpen) { setTimeout(() => document.getElementById('chatInput').focus(), 280); scrollToBottom(); }
+}
+function switchTab(tab, el) {
+  currentTab = tab; document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); renderMessages();
+}
+function renderMessages() {
+  const container = document.getElementById('chatMessages');
+  const empty = document.getElementById('chatEmpty');
+  const msgs = chatHistory[currentTab] || [];
+  Array.from(container.children).forEach(child => { if (child !== empty) child.remove(); });
+  if (msgs.length === 0) {
+    empty.style.display = 'flex';
+    const hasKey = !!localStorage.getItem('claude_api_key');
+    empty.innerHTML = '<div style="font-size:30px">🤖</div><div style="font-weight:600;font-size:13px">O que está na sua cabeça?</div>' + (!hasKey ? '<div style="font-size:11px;margin-top:3px;color:var(--amber)">⚠️ Configure a API key em ⚙️</div>' : '<div style="font-size:11px;margin-top:2px">Digite e pressione Enter</div>');
+  } else {
+    empty.style.display = 'none';
+    msgs.forEach(m => { const div = document.createElement('div'); div.className = 'msg ' + (m.role === 'user' ? 'msg-user' : 'msg-ai'); div.textContent = m.content; container.appendChild(div); });
+  }
+  scrollToBottom();
+}
+function scrollToBottom() { const c = document.getElementById('chatMessages'); c.scrollTop = c.scrollHeight; }
+function handleChatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function autoResizeChat(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 110) + 'px'; }
+async function sendMessage() {
+  if (isSending) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const apiKey = localStorage.getItem('claude_api_key');
+  if (!apiKey) { openApiSettings(); return; }
+  chatHistory[currentTab].push({ role: 'user', content: text });
+  input.value = ''; input.style.height = '38px';
+  renderMessages();
+  const container = document.getElementById('chatMessages');
+  const thinking = document.createElement('div');
+  thinking.className = 'msg-thinking'; thinking.textContent = '⏳ Pensando...'; container.appendChild(thinking); scrollToBottom();
+  isSending = true; document.getElementById('chatSend').disabled = true;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-allow-browser': 'true' }, body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 1024, system: CHAT_TABS[currentTab].system, messages: chatHistory[currentTab] }) });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error?.message || 'Erro ' + res.status); }
+    const data = await res.json();
+    const reply = data.content[0].text;
+    chatHistory[currentTab].push({ role: 'assistant', content: reply });
+    localStorage.setItem('chat_' + currentTab, JSON.stringify(chatHistory[currentTab]));
+  } catch (err) { chatHistory[currentTab].push({ role: 'assistant', content: '❌ Erro: ' + err.message }); }
+  thinking.remove(); isSending = false; document.getElementById('chatSend').disabled = false; renderMessages(); document.getElementById('chatInput').focus();
+}
+function clearCurrentChat() {
+  const labels = { geral:'Geral', ton:'Ton', conteudo:'Conteúdo', estrategia:'Estratégia', pessoal:'Pessoal' };
+  if (!confirm('Limpar "' + labels[currentTab] + '"?')) return;
+  chatHistory[currentTab] = []; localStorage.removeItem('chat_' + currentTab); renderMessages();
+}
+function openApiSettings() { document.getElementById('apiModal').classList.add('open'); setTimeout(() => document.getElementById('apiKeyInput').focus(), 100); }
+function closeApiSettings() { document.getElementById('apiModal').classList.remove('open'); }
+function saveApiKey() { const key = document.getElementById('apiKeyInput').value.trim(); if (!key.startsWith('sk-ant')) { alert('Key inválida. Deve começar com sk-ant...'); return; } localStorage.setItem('claude_api_key', key); closeApiSettings(); renderMessages(); }
+document.getElementById('apiModal').addEventListener('click', function(e) { if (e.target === this) closeApiSettings(); });
+
+const QUICK_TEMPLATES = {
+  consultorio: `📊 Dados Consultório — ${new Date().toLocaleDateString('pt-BR')}:\n- Atendimentos hoje:\n- Receita do dia: R$\n- Convênio (Iron/Conexa):\n- Particular presencial:\n- Particular online:\n- Pendências/observações:\n\nOrganize e me dê um resumo + próximas ações.`,
+  doutores: `👨‍🍳 Atualização Doutores na Cozinha — ${new Date().toLocaleDateString('pt-BR')}:\n- Confirmados:\n- Data/local:\n- Pendências:\n\nAnalise e sugira próximos passos.`,
+  mocannabis: `🌿 MOCANNABIS — ${new Date().toLocaleDateString('pt-BR')}:\n- Contexto:\n- Oportunidade:\n- Ações pendentes:\n\nMe ajude a pensar numa estratégia.`,
+  percepcao: `💡 Percepção — ${new Date().toLocaleDateString('pt-BR')}:\n\nIdeia/observação:\n\n\nContexto:\n\n\nPossível conexão futura:\n\n`
+};
+function quickInsert(key) {
+  const input = document.getElementById('chatInput');
+  input.value = QUICK_TEMPLATES[key]; autoResizeChat(input); input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+// ==================== DADOS DINÂMICOS N8N ====================
+const N8N = 'http://secretariaclinica.duckdns.org:5678/webhook';
+
+async function carregarStatusTon() {
+  const badge = document.getElementById('tonStatusBadge');
+  const sub = document.getElementById('tonSubtitle');
+  try {
+    const r = await fetch(N8N + '/dashboard/ton');
+    const d = await r.json();
+    if (d.ativo) {
+      badge.textContent = '🟢 Online';
+      badge.className = 'badge badge-green';
+    } else {
+      badge.textContent = '🔴 Offline';
+      badge.className = 'badge badge-red';
+    }
+    if (sub) sub.textContent = 'WhatsApp · n8n · Google Calendar · atualizado ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    badge.textContent = '⚠️ Sem conexão';
+    badge.className = 'badge badge-amber';
+    if (sub) sub.textContent = 'WhatsApp · n8n · Google Calendar · offline';
+  }
+}
+
+async function carregarCalendario() {
+  const body = document.getElementById('consultasBody');
+  const sub = document.getElementById('consultasSubtitle');
+  try {
+    const r = await fetch(N8N + '/dashboard/calendario');
+    const d = await r.json();
+    const eventos = d.eventos || [];
+
+    if (eventos.length === 0) {
+      body.innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:16px 0">Nenhuma consulta nos próximos 14 dias.</div>';
+      if (sub) sub.textContent = '0 eventos · próximos 14 dias';
+      return;
+    }
+
+    const dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+    function fmtData(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return dias[d.getDay()] + ' ' + d.getDate() + '/' + String(d.getMonth()+1).padStart(2,'0');
+    }
+    function fmtHora(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    }
+    function tipoTag(titulo) {
+      const t = titulo.toLowerCase();
+      if (t.includes('menos peso')) return '<span class="badge badge-purple">Menos Peso</span>';
+      if (t.includes('presencial')) return '<span class="badge badge-blue">Presencial</span>';
+      if (t.includes('online')) return '<span class="badge badge-green">Online</span>';
+      if (t.includes('bloqueio') || t.includes('block')) return '<span class="badge badge-gray">Bloqueio</span>';
+      return '<span class="badge badge-gray">Evento</span>';
+    }
+    function isHoje(iso) {
+      if (!iso) return false;
+      const d = new Date(iso); const hoje = new Date();
+      return d.getDate()===hoje.getDate() && d.getMonth()===hoje.getMonth() && d.getFullYear()===hoje.getFullYear();
+    }
+
+    const html = `<table class="cal-table"><thead><tr><th>Data</th><th>Hora</th><th>Paciente / Evento</th><th>Tipo</th></tr></thead><tbody>` +
+      eventos.map(e => {
+        const hoje = isHoje(e.inicio);
+        return `<tr${hoje?' class="today"':''}>
+          <td class="post-date">${fmtData(e.inicio)}</td>
+          <td>${fmtHora(e.inicio)}</td>
+          <td class="post-title">${e.titulo}</td>
+          <td>${tipoTag(e.titulo)}</td>
+        </tr>`;
+      }).join('') +
+      `</tbody></table>`;
+
+    body.innerHTML = html;
+    const consultas = eventos.filter(e => !e.titulo.toLowerCase().includes('bloqueio'));
+    if (sub) sub.textContent = consultas.length + ' consulta' + (consultas.length!==1?'s':'') + ' · próximos 14 dias · atualizado ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    body.innerHTML = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:16px 0">⚠️ Não foi possível carregar a agenda. Verifique a conexão com o n8n.</div>';
+    if (sub) sub.textContent = 'Erro ao carregar · ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+}
+
+// Carregar dados dinâmicos ao abrir
+carregarStatusTon();
+carregarCalendario();
+// Atualizar a cada 5 minutos
+setInterval(() => { carregarStatusTon(); carregarCalendario(); }, 5 * 60 * 1000);
+// ==================== FIM DADOS DINÂMICOS ====================
+
+// ==================== CONTAS & FINANÇAS ====================
+let contasFiltro = 'todas';
+
+function getContas() {
+  const raw = localStorage.getItem('contas_v1');
+  return raw ? JSON.parse(raw) : [];
+}
+function saveContas(contas) {
+  localStorage.setItem('contas_v1', JSON.stringify(contas));
+}
+
+function calcularStatus(diaVenc) {
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = hoje.getMonth();
+  const dia = hoje.getDate();
+
+  // próximo vencimento neste mês ou no próximo
+  let venc = new Date(ano, mes, diaVenc);
+  if (venc < hoje) venc = new Date(ano, mes + 1, diaVenc);
+
+  const diff = Math.ceil((venc - new Date(ano, mes, dia)) / 86400000);
+
+  if (diff < 0) return { status: 'vencida', label: 'VENCIDA', diasRestantes: diff, venc };
+  if (diff === 0) return { status: 'urgente', label: 'VENCE HOJE', diasRestantes: 0, venc };
+  if (diff <= 3) return { status: 'urgente', label: `VENCE EM ${diff}D`, diasRestantes: diff, venc };
+  if (diff <= 7) return { status: 'proximo', label: `EM ${diff} DIAS`, diasRestantes: diff, venc };
+  return { status: 'ok', label: `EM ${diff} DIAS`, diasRestantes: diff, venc };
+}
+
+function renderContas() {
+  const contas = getContas();
+  const lista = document.getElementById('contasList');
+  const totaisEl = document.getElementById('contasTotais');
+  if (!lista) return;
+
+  const filtradas = contasFiltro === 'todas' ? contas : contas.filter(c => c.categoria === contasFiltro);
+
+  // Ordenar: vencidas primeiro, depois por dias restantes
+  filtradas.sort((a, b) => {
+    const sa = calcularStatus(a.diaVenc);
+    const sb = calcularStatus(b.diaVenc);
+    return sa.diasRestantes - sb.diasRestantes;
+  });
+
+  if (filtradas.length === 0) {
+    lista.innerHTML = '<div class="conta-empty">Nenhuma conta cadastrada nessa categoria.</div>';
+  } else {
+    lista.innerHTML = filtradas.map(c => {
+      const s = calcularStatus(c.diaVenc);
+      const vencStr = s.venc.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+      const valorFmt = 'R$ ' + Number(c.valor).toLocaleString('pt-BR', {minimumFractionDigits:2});
+      return `<div class="conta-item status-${s.status}">
+        <div style="flex:1">
+          <div class="conta-nome">${c.nome}</div>
+          <div class="conta-meta">${c.categoria} · venc. dia ${c.diaVenc} (${vencStr})${c.obs ? ' · ' + c.obs : ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="conta-badge ${s.status === 'ok' ? 'ok' : s.status === 'proximo' ? 'proximo' : s.status === 'urgente' ? 'urgente' : 'vencida'}">${s.label}</span>
+          <span class="conta-valor">${valorFmt}</span>
+          <button class="conta-del" onclick="deletarConta('${c.id}')" title="Remover">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Totais por categoria
+  const cats = ['Pessoal', 'Consultório', 'Menos Peso'];
+  const totais = {};
+  let totalGeral = 0;
+  cats.forEach(cat => {
+    const soma = contas.filter(c => c.categoria === cat).reduce((acc, c) => acc + Number(c.valor), 0);
+    totais[cat] = soma;
+    totalGeral += soma;
+  });
+
+  totaisEl.innerHTML = `
+    <div class="conta-total-box"><div class="conta-total-label">🏠 Pessoal</div><div class="conta-total-val">R$ ${totais['Pessoal'].toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+    <div class="conta-total-box"><div class="conta-total-label">🏥 Consultório</div><div class="conta-total-val">R$ ${totais['Consultório'].toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+    <div class="conta-total-box"><div class="conta-total-label">⚖️ Menos Peso</div><div class="conta-total-val">R$ ${totais['Menos Peso'].toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+    <div class="conta-total-box" style="border-color:var(--blue)"><div class="conta-total-label" style="color:var(--blue)">TOTAL/MÊS</div><div class="conta-total-val" style="color:var(--blue)">R$ ${totalGeral.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
+  `;
+
+  // Subtitle badge
+  const alertas = contas.filter(c => {
+    const s = calcularStatus(c.diaVenc);
+    return s.status === 'vencida' || s.status === 'urgente';
+  }).length;
+  const sub = document.getElementById('contasSubtitle');
+  if (sub) {
+    if (alertas > 0) sub.innerHTML = `<span style="color:var(--red);font-weight:700">⚠️ ${alertas} conta${alertas > 1 ? 's' : ''} precisam de atenção</span>`;
+    else sub.textContent = contas.length + ' conta' + (contas.length !== 1 ? 's' : '') + ' cadastrada' + (contas.length !== 1 ? 's' : '');
+  }
+}
+
+function filtrarContas(cat, el) {
+  contasFiltro = cat;
+  document.querySelectorAll('.conta-filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderContas();
+}
+
+function toggleFormConta() {
+  const form = document.getElementById('contaFormArea');
+  const btn = document.getElementById('btnAddConta');
+  const showing = form.style.display === 'block';
+  form.style.display = showing ? 'none' : 'block';
+  btn.style.display = showing ? 'block' : 'none';
+  if (!showing) document.getElementById('cfNome').focus();
+}
+
+function salvarConta() {
+  const nome = document.getElementById('cfNome').value.trim();
+  const categoria = document.getElementById('cfCategoria').value;
+  const valor = parseFloat(document.getElementById('cfValor').value);
+  const diaVenc = parseInt(document.getElementById('cfDia').value);
+  const obs = document.getElementById('cfObs').value.trim();
+
+  if (!nome) { alert('Informe o nome da conta.'); return; }
+  if (!valor || valor <= 0) { alert('Informe o valor.'); return; }
+  if (!diaVenc || diaVenc < 1 || diaVenc > 31) { alert('Informe o dia de vencimento (1-31).'); return; }
+
+  const contas = getContas();
+  contas.push({ id: Date.now().toString(), nome, categoria, valor, diaVenc, obs, criadoEm: new Date().toISOString() });
+  saveContas(contas);
+
+  // Limpar form
+  ['cfNome','cfValor','cfDia','cfObs'].forEach(id => document.getElementById(id).value = '');
+  toggleFormConta();
+  renderContas();
+}
+
+function deletarConta(id) {
+  if (!confirm('Remover esta conta?')) return;
+  const contas = getContas().filter(c => c.id !== id);
+  saveContas(contas);
+  renderContas();
+}
+
+function verificarAlertas() {
+  const contas = getContas();
+  const hoje = new Date();
+  const chaveHoje = `alertas_${hoje.toDateString()}`;
+  if (localStorage.getItem(chaveHoje)) return; // já alertou hoje
+
+  const urgentes = contas.filter(c => {
+    const s = calcularStatus(c.diaVenc);
+    return s.diasRestantes >= 0 && s.diasRestantes <= 7;
+  });
+
+  if (urgentes.length > 0) {
+    const msg = urgentes.map(c => {
+      const s = calcularStatus(c.diaVenc);
+      return `• ${c.nome} — ${s.label}`;
+    }).join('\n');
+    setTimeout(() => {
+      if (confirm('⚠️ CONTAS PRÓXIMAS DO VENCIMENTO:\n\n' + msg + '\n\nVer detalhes?')) {
+        document.getElementById('contasList').scrollIntoView({behavior:'smooth'});
+      }
+    }, 1500);
+    localStorage.setItem(chaveHoje, '1');
+  }
+}
+
+// Init contas
+renderContas();
+verificarAlertas();
+// ==================== FIM CONTAS ====================
+
+// Clock & date
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+  const days = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  document.getElementById('dateDisplay').textContent = days[now.getDay()] + ', ' + now.getDate() + ' de ' + months[now.getMonth()] + ' de ' + now.getFullYear();
+  // Update today subtitle and badge
+  document.getElementById('todaySubtitle').textContent = days[now.getDay()] + '-feira, ' + now.getDate() + ' de ' + months[now.getMonth()];
+  const all = document.querySelectorAll('.check-item');
+  const done = document.querySelectorAll('.check-item.done');
+  document.getElementById('pendBadge').textContent = (all.length - done.length) + ' pendentes';
+}
+updateClock();
+setInterval(updateClock, 1000);
+initChat();
+</script>
+</body>
+</html>

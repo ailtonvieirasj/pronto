@@ -196,6 +196,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
       <div class="field"><label>Prontuario / Cartao SUS</label><input id="pront" type="text" /></div>
       <div class="field"><label>Profissao</label><input id="prof" type="text" /></div>
     </div>
+    <div class="g2" style="margin-top:8px">
+      <div class="field"><label>Telefone / WhatsApp</label><input id="telefone" type="text" placeholder="(00) 00000-0000" /></div>
+      <div class="field"><label>Email</label><input id="email_pac" type="text" placeholder="email@exemplo.com" /></div>
+    </div>
+    <div class="g3" style="margin-top:8px">
+      <div class="field span2"><label>Endereco</label><input id="endereco" type="text" placeholder="Rua, numero, bairro" /></div>
+      <div class="field"><label>Cidade / Estado</label><input id="cidadeEstado" type="text" placeholder="Cidade - UF" /></div>
+    </div>
   </div>
 
   <!-- ANAMNESE -->
@@ -1025,6 +1033,10 @@ async function buscarPaciente(){
   document.getElementById('meds').value=pac.medicamentos||'';
   document.getElementById('alergia').value=pac.alergias||'';
   window._telPaciente = pac.tel || '';
+  var elTel = document.getElementById('telefone'); if(elTel) elTel.value = pac.tel || '';
+  var elEmail = document.getElementById('email_pac'); if(elEmail) elEmail.value = pac.email || '';
+  var elEnd = document.getElementById('endereco'); if(elEnd) elEnd.value = pac.endereco || '';
+  var elCid = document.getElementById('cidadeEstado'); if(elCid) elCid.value = (pac.cidade||'') + (pac.cidade && pac.estado ? ' - ' : '') + (pac.estado||'');
   document.getElementById('sec-link-paciente').style.display = 'block';
   showCpfMsg('Paciente encontrado: '+pac.nome,'ok');
   carregarRespostasPaciente(cpfInput);
